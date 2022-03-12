@@ -8,4 +8,4 @@ Algorithms to implement: \
     - A* \
     - Breath First Search \
     - Iterative Deepening Depth First Search \
-    - Uniform Cost Search \
+    - Uniform Cost Search
