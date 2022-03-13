@@ -12,7 +12,7 @@ def drawMaze(maze, solution=False):
         raise TypeError("You must pass a maze to draw")
 
     # Temporary grid where the start and the end are set to 2 and 3
-    grid = maze.grid
+    grid = maze.grid.copy()
     grid[maze.start] = 2
     grid[maze.end] = 3
 
@@ -25,8 +25,9 @@ def drawMaze(maze, solution=False):
     # 1 -> black : walls
     # 2 -> blue : start
     # 3 -> red : exit
+    # 4 -> yellow : solution
     color_map = colors.ListedColormap(['white', 'black', 'blue', 'red', 'yellow'])
-    bounds = list(range(0, 6))  # [0, 1, 2, 3, 4]
+    bounds = list(range(0, 6))  # [0, 1, 2, 3, 4, 5]
     norm = colors.BoundaryNorm(bounds, color_map.N)
 
     # Draw the maze
@@ -35,7 +36,8 @@ def drawMaze(maze, solution=False):
 
     # Show grid
     plt.grid(which='major', axis='both')
-    plt.xticks(np.arange(-0.5, grid.shape[1], 1)), plt.yticks(np.arange(-0.5, grid.shape[0], 1))
+    plt.xticks(np.arange(-0.5, grid.shape[1], 1))
+    plt.yticks(np.arange(-0.5, grid.shape[0], 1))
 
     # Remove tick labels
     ax.set_yticklabels([])
@@ -78,9 +80,9 @@ def wallBreaker(maze):
     for i in range(1, maze.grid.shape[0] - 1):
         for j in range(1, maze.grid.shape[1] - 1):
             if maze.grid[i][j] == 1:
-                if canBreakWall(maze, j, i):
-                    r = random.randint(1, 8)
-                    if r == 7:
+                r = random.randint(1, 7)
+                if r == 7:
+                    if canBreakWall(maze, j, i):
                         maze.grid[i][j] = 0
 
 
@@ -88,14 +90,14 @@ for i in range(1):
 
     m = Maze()
 
-    m.generator = AldousBroder(10, 10)
+    m.generator = AldousBroder(10, 15)
     m.generate()
     m.generate_entrances()
     m.solver = ShortestPath()
     m.solve()
-    drawMaze(m, True)
+    drawMaze(m)
 
     wallBreaker(m)
     m.solve()
     # print('number of solutions = ', len(m.solutions), '\n')
-    drawMaze(m, True)
+    drawMaze(m)

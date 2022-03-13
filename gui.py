@@ -21,6 +21,7 @@ dot.edge('A', 'C', constraint='true')
 
 # Save image
 dot.render(directory='.', view=False)
+
 dot.edge('B', 'C', constraint='false')
 dot.render(directory='./ciao/', view=False)
 
@@ -30,6 +31,7 @@ dot.render(directory='./ciao/', view=False)
 root = Tk()
 label = Label(root)
 label.pack()
+
 nextButton = tkinter.Button(root, text="Next", command=lambda: changeImage('./ciao/img1.gv.png', label))
 nextButton.pack()
 
