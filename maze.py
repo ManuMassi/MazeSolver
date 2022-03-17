@@ -28,6 +28,10 @@ class MazeManager:
         maze.generator = AldousBroder(height, width)
         maze.generate()
         maze.generate_entrances()
+
+        maze.start = MazeManager.getAdjacentSquares(maze, maze.start, SquareType.ROOM)[0]
+        maze.end = MazeManager.getAdjacentSquares(maze, maze.end, SquareType.ROOM)[0]
+
         MazeManager.wallBreaker(maze)
 
         return maze
@@ -39,8 +43,6 @@ class MazeManager:
 
         # Temporary grid where the start and the end are set to 2 and 3
         grid = maze.grid.copy()
-        grid[maze.start] = SquareType.START.value
-        grid[maze.end] = SquareType.EXIT.value
 
         if solution and maze.solutions:
             for y, x in maze.solutions[0]:
@@ -49,6 +51,9 @@ class MazeManager:
         if stateSpace:
             for y, x in MazeManager.defineStateSpace(maze):
                 grid[y][x] = SquareType.STATE.value
+
+        grid[maze.start] = SquareType.START.value
+        grid[maze.end] = SquareType.EXIT.value
 
         # Color map:
         # 0 -> white : empty spaces
@@ -71,47 +76,49 @@ class MazeManager:
         plt.yticks(np.arange(-0.5, grid.shape[0], 1))
 
         # Remove tick labels
-        ax.set_yticklabels([])
-        ax.set_xticklabels([])
+        # ax.set_yticklabels([])
+        # ax.set_xticklabels([])
 
         plt.show()
 
     @staticmethod
-    def getAdjacentSquares(maze, x, y, squareType=SquareType.WALL):
+    def getAdjacentSquares(maze, square, squareType=SquareType.WALL):
         if type(squareType) is not SquareType:
             raise TypeError("You must pass a SquareType type")
 
-        adjacentSquares = []
+        y = square[0]
+        x = square[1]
+        adjacent_squares = []
 
         for i in range(-1, 2, 2):  # [-1, 1]
             try:
                 if maze.grid[y + i][x] == squareType.value and y + i >= 0:
-                    adjacentSquares.append((x, y + i))
+                    adjacent_squares.append((y + i, x))
             except IndexError:
                 pass
 
             try:
                 if maze.grid[y][x + i] == squareType.value and x + i >= 0:
-                    adjacentSquares.append((x + i, y))
+                    adjacent_squares.append((y, x + i))
             except IndexError:
                 pass
 
-        return adjacentSquares
+        return adjacent_squares
 
     @staticmethod
-    def canBreakWall(maze, wall_x, wall_y):
-        adjacentWalls = MazeManager.getAdjacentSquares(maze, wall_x, wall_y, SquareType.WALL)
+    def canBreakWall(maze, wall):
+        adjacent_walls = MazeManager.getAdjacentSquares(maze, wall, SquareType.WALL)
 
-        if len(adjacentWalls) != 2:
+        if len(adjacent_walls) != 2:
             return False
 
-        coords = adjacentWalls[0]
+        coords = adjacent_walls[0]
 
-        for adjacentWall in adjacentWalls[1:]:
+        for adjacentWall in adjacent_walls[1:]:
             if adjacentWall[0] != coords[0] and adjacentWall[1] != coords[1]:
                 return False
             else:
-                coords = adjacentWalls
+                coords = adjacent_walls
 
         return True
 
@@ -122,28 +129,50 @@ class MazeManager:
                 if maze.grid[i][j] == SquareType.WALL.value:
                     r = random.randint(1, 7)
                     if r == 7:
-                        if MazeManager.canBreakWall(maze, j, i):
+                        if MazeManager.canBreakWall(maze, (i, j)):
                             maze.grid[i][j] = SquareType.ROOM.value
 
     @staticmethod
     def defineStateSpace(maze):
         # maze.start and maze.end are on the outer wall. therefore, you can get the only adjacent room
         # simply by calling getAdjacentSquares on it and it returns only one room.
-        stateSpace = [MazeManager.getAdjacentSquares(maze, maze.start[0], maze.start[1], SquareType.ROOM)[0],
-                      MazeManager.getAdjacentSquares(maze, maze.end[0], maze.end[1], SquareType.ROOM)[0]]
+        # state_space = [MazeManager.getAdjacentSquares(maze, maze.start, SquareType.ROOM)[0],
+        #               MazeManager.getAdjacentSquares(maze, maze.end, SquareType.ROOM)[0]]
+        state_space = [maze.start, maze.end]
 
         for i in range(1, maze.grid.shape[0] - 1):
             for j in range(1, maze.grid.shape[1] - 1):
                 if maze.grid[i][j] == SquareType.ROOM.value:
-                    if len(MazeManager.getAdjacentSquares(maze, j, i, SquareType.ROOM)) >= 3:
-                        stateSpace.append((i, j))
+                    if len(MazeManager.getAdjacentSquares(maze, (i, j), SquareType.ROOM)) >= 3:
+                        state_space.append((i, j))
 
-        return stateSpace
+        return state_space
+
+    @staticmethod
+    def getReachableStates(maze, state):
+        reachable_states = []
+        state_space = MazeManager.defineStateSpace(maze)
+
+        if state not in state_space:
+            raise ValueError("The room is not a state of the maze problem")
+
+        def recursiveNeighboursSearch(maze, state, state_space, reachable_states, visited_rooms):
+            for square in MazeManager.getAdjacentSquares(maze, state, SquareType.ROOM):
+                if square not in visited_rooms:
+                    visited_rooms.append(square)
+                    if square in state_space:
+                        reachable_states.append(square)
+                    else:
+                        recursiveNeighboursSearch(maze, square, state_space, reachable_states, visited_rooms)
+
+        recursiveNeighboursSearch(maze, state, state_space, reachable_states, [state])
+
+        return reachable_states
 
 
-# main :)
-for i in range(1):
+if __name__ == "__main__":
+    for i in range(1):
 
-    manager = MazeManager(10, 10)
-    manager.drawMaze(manager.maze, stateSpace=True)
-    manager.defineStateSpace(manager.maze)
+        manager = MazeManager(10, 10)
+        manager.drawMaze(manager.maze, stateSpace=True)
+        manager.getReachableStates(manager.maze, state=(7, 7))
