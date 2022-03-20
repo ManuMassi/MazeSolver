@@ -44,13 +44,14 @@ class MazeManager:
         # Temporary grid where the start and the end are set to 2 and 3
         grid = maze.grid.copy()
 
-        if solution and maze.solutions:
-            for y, x in maze.solutions[0]:
-                grid[y][x] = SquareType.SOLUTION.value
-
         if stateSpace:
             for y, x in MazeManager.defineStateSpace(maze):
                 grid[y][x] = SquareType.STATE.value
+
+        if solution and maze.solutions:
+            for room in maze.solutions:
+                print(room)
+                grid[room.data[0]][room.data[1]] = SquareType.SOLUTION.value
 
         grid[maze.start] = SquareType.START.value
         grid[maze.end] = SquareType.EXIT.value
@@ -76,8 +77,8 @@ class MazeManager:
         plt.yticks(np.arange(-0.5, grid.shape[0], 1))
 
         # Remove tick labels
-        # ax.set_yticklabels([])
-        # ax.set_xticklabels([])
+        ax.set_yticklabels([])
+        ax.set_xticklabels([])
 
         plt.show()
 
