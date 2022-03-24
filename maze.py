@@ -45,13 +45,13 @@ class MazeManager:
         # Temporary grid where the start and the end are set to 2 and 3
         grid = maze.grid.copy()
 
-        if stateSpace:
-            for y, x in MazeManager.defineStateSpace(maze):
-                grid[y][x] = SquareType.STATE.value
-
         if solution and maze.solutions:
             for room in maze.solutions:
                 grid[room.data[0]][room.data[1]] = SquareType.SOLUTION.value
+
+        if stateSpace:
+            for y, x in MazeManager.defineStateSpace(maze):
+                grid[y][x] = SquareType.STATE.value
 
         grid[maze.start] = SquareType.START.value
         grid[maze.end] = SquareType.EXIT.value
@@ -137,8 +137,6 @@ class MazeManager:
     def defineStateSpace(maze):
         # maze.start and maze.end are on the outer wall. therefore, you can get the only adjacent room
         # simply by calling getAdjacentSquares on it and it returns only one room.
-        # state_space = [MazeManager.getAdjacentSquares(maze, maze.start, SquareType.ROOM)[0],
-        #               MazeManager.getAdjacentSquares(maze, maze.end, SquareType.ROOM)[0]]
         state_space = [maze.start, maze.end]
 
         for i in range(1, maze.grid.shape[0] - 1):
@@ -153,7 +151,6 @@ class MazeManager:
     def getReachableStates(maze, state):
         reachable_states = []
         state_space = MazeManager.defineStateSpace(maze)
-
         if state not in state_space:
             raise ValueError("The room is not a state of the maze problem")
 
@@ -170,6 +167,7 @@ class MazeManager:
         recursiveNeighboursSearch(maze, state, state_space, reachable_states, [state])
 
         return reachable_states
+
 
     @staticmethod
     def getPath(maze, start, end):
@@ -190,6 +188,39 @@ class MazeManager:
         temp_maze.solutions[0].append(end)
 
         return temp_maze.solutions[0]
+
+    # @staticmethod
+    # def findPath(maze, start, goal):
+    #     path = []
+    #     visited_adjacents = []
+    #     reachable_states = MazeManager.getReachableStates(maze, start)
+    #
+    #     room = start
+    #
+    #     while room != goal:
+    #
+    #         adjacents = MazeManager.getAdjacentSquares(maze, room, SquareType.ROOM)
+    #
+    #         random_adjacent = adjacents[0]
+    #
+    #         while random_adjacent in visited_adjacents:
+    #             random_index = random.randint(0, len(adjacents) - 1)
+    #             random_adjacent = adjacents[random_index]
+    #
+    #         if random_adjacent in reachable_states:
+    #             if random_adjacent == goal:
+    #                 path.append(random_adjacent)
+    #                 return path
+    #             else:
+    #                 path = []
+    #                 visited_adjacents.append(random_adjacent)
+    #                 room = start
+    #
+    #         else:
+    #             path.append(random_adjacent)
+    #             visited_adjacents.append(random_adjacent)
+    #             room = random_adjacent
+
 
 
 if __name__ == "__main__":
