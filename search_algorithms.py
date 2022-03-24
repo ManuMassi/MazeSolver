@@ -1,6 +1,7 @@
 from maze import MazeManager
 from tree import Node
-import graphviz
+from mazelib.solve.BacktrackingSolver import BacktrackingSolver
+from gui import drawTree
 
 
 def expand(maze, node):
@@ -14,8 +15,8 @@ def expand(maze, node):
 
 
 def tree_search(maze, start_state, goal_state, enqueue):
-    tree = graphviz.Digraph('tree', format='png')
 
+    expanded = []
     root = Node(start_state)
     goal = Node(goal_state)
 
@@ -25,23 +26,20 @@ def tree_search(maze, start_state, goal_state, enqueue):
 
         node = fringe.pop(0)
 
-        tree.node(str(node.id), str(node.data))
+        # tree.node(str(node.id), str(node.data))
 
         if node.data == goal.data:
             solution = node.ancestors.copy()[::-1]
             solution.append(goal)
 
-            tree.render(directory='.', view=False)
+            drawTree(expanded)
 
             maze.solutions = solution
             return solution
         else:
             successors = expand(maze, node)
+            expanded.append(node)
             node.add_children_list(successors)
-
-            for child in successors:
-                tree.node(str(child.id), str(child.data))
-                tree.edge(str(node.id), str(child.id), constraint='true')
 
             enqueue(successors, fringe)
 

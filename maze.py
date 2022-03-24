@@ -3,6 +3,7 @@ from enum import Enum
 from matplotlib import colors
 from mazelib import Maze
 from mazelib.generate.AldousBroder import AldousBroder
+from mazelib.solve.ShortestPaths import ShortestPaths
 import matplotlib.pyplot as plt
 import numpy as np
 import random
@@ -154,6 +155,7 @@ class MazeManager:
             raise ValueError("The room is not a state of the maze problem")
 
         def recursiveNeighboursSearch(maze, state, state_space, reachable_states, visited_rooms):
+            print(state)
             for square in MazeManager.getAdjacentSquares(maze, state, SquareType.ROOM):
                 if square not in visited_rooms:
                     visited_rooms.append(square)
@@ -165,6 +167,27 @@ class MazeManager:
         recursiveNeighboursSearch(maze, state, state_space, reachable_states, [state])
 
         return reachable_states
+
+
+    @staticmethod
+    def getPath(maze, start, end):
+        # Create a copy of the maze
+        temp_maze = Maze()
+        temp_maze.grid = maze.grid.copy()
+
+        # Set start and end
+        temp_maze.start = start
+        temp_maze.end = end
+
+        # Use a pre-implemented algorithm to find path
+        temp_maze.solver = ShortestPaths()
+        temp_maze.solve()
+
+        # Adds start and end node to solution
+        temp_maze.solutions[0].insert(0, start)
+        temp_maze.solutions[0].append(end)
+
+        return temp_maze.solutions[0]
 
     # @staticmethod
     # def findPath(maze, start, goal):
@@ -199,9 +222,12 @@ class MazeManager:
     #             room = random_adjacent
 
 
+
 if __name__ == "__main__":
     for i in range(1):
 
         manager = MazeManager(10, 10)
-        manager.drawMaze(manager.maze, stateSpace=True)
-        manager.getReachableStates(manager.maze, state=(7, 7))
+        # manager.drawMaze(manager.maze, stateSpace=True)
+        # print(manager.getReachableStates(manager.maze, state=(19, 9)))
+        # print(manager.getReachableStatesIterative(manager.maze, state=(19, 9)))
+        print(MazeManager.getPath(manager.maze, (19, 9), (17, 7)))
