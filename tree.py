@@ -5,6 +5,7 @@ class Node:
         self.data = data
         self.children = []
         self.ancestors = []
+        self.path_cost = 0
 
         self.id = random.randint(0, 100000000)
 
@@ -18,15 +19,13 @@ class Node:
         for ancestor in self.ancestors:
             node._add_ancestor(ancestor)
 
-    def add_children_list(self, nodes):
-        for node in nodes:
-            self.add_children(node)
-
     def _add_ancestor(self, node):
         if type(node) is not Node:
             raise TypeError("You must add a node type (Node(data))")
 
         self.ancestors.append(node)
+        if len(self.ancestors) == 1:
+            self.path_cost = self.ancestors[0].path_cost
 
     def __eq__(self, other):
         if type(other) is not Node:

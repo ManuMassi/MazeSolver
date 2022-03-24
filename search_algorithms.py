@@ -1,4 +1,4 @@
-from maze import MazeManager
+from maze import MazeManager, SquareType
 from tree import Node
 from mazelib.solve.BacktrackingSolver import BacktrackingSolver
 from gui import drawTree
@@ -6,6 +6,7 @@ from gui import drawTree
 
 def expand(maze, node):
     states = MazeManager.getReachableStates(maze, node.data)
+    # states = MazeManager.getAdjacentSquares(maze, node.data, SquareType.ROOM)
 
     ancestors = [ancestor.data for ancestor in node.ancestors]
 
@@ -30,7 +31,8 @@ def tree_search(maze, start_state, goal_state, enqueue):
 
         if node.data == goal.data:
             solution = node.ancestors.copy()[::-1]
-            solution.append(goal)
+            # solution.append(goal)
+            print(node.path_cost)
 
             drawTree(expanded)
 
@@ -39,10 +41,13 @@ def tree_search(maze, start_state, goal_state, enqueue):
         else:
             successors = expand(maze, node)
             expanded.append(node)
-            node.add_children_list(successors)
+
+            for successor in successors:
+                node.add_children(successor)
+                # successor.path_cost += len(MazeManager.getPath(maze, node.data, successor.data))
 
             enqueue(successors, fringe)
-
+        # print(node, ':', node.path_cost)
     return False
 
 
@@ -56,7 +61,9 @@ def breadth_first_search(maze, start_state, goal_state):
 
 
 if __name__ == '__main__':
-    manager = MazeManager(10, 10)
+    for i in range(1):
+        manager = MazeManager(10, 10)
+        # manager.drawMaze(manager.maze, stateSpace=True)
 
-    print(breadth_first_search(manager.maze, manager.maze.start, manager.maze.end))
-    manager.drawMaze(manager.maze, solution=True, stateSpace=True)
+        print(breadth_first_search(manager.maze, manager.maze.start, manager.maze.end))
+        manager.drawMaze(manager.maze, solution=True, stateSpace=True)
