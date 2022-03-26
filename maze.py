@@ -164,7 +164,7 @@ class MazeManager:
 
         room = start
 
-        while room != goal:
+        while True:
             # Find adjacents actual node
             adjacents = MazeManager.getAdjacentSquares(maze, room, SquareType.ROOM)
 
