@@ -53,7 +53,7 @@ class MazeManager:
         if solution and maze.solutions:
             for i, state in enumerate(maze.solutions):
                 if i != len(maze.solutions) - 1:
-                    path = MazeManager.getPath(maze, state.data, maze.solutions[i+1].data)
+                    path = MazeManager.getReachablePaths(maze, state.data, maze.solutions[i + 1].data)
                     for room in path:
                         grid[room[0]][room[1]] = SquareType.SOLUTION.value
 
@@ -156,7 +156,7 @@ class MazeManager:
         return len(MazeManager.getAdjacentSquares(maze, room, SquareType.ROOM)) >= 3 or room == maze.start or room == maze.end
 
     @staticmethod
-    def getPath(maze, start):
+    def getReachablePaths(maze, start):
         paths = []
         visited_adjacents = []
         reachable_states = []
@@ -209,5 +209,5 @@ if __name__ == "__main__":
         # print(MazeManager.getPath(manager.maze, (19, 9), (17, 7)))
         # print(MazeManager.getReachableStates(manager.maze, (19, 9)))
         # print(MazeManager.getPath(manager.maze, (19, 9), (17, 7)))
-        print(MazeManager.getPath(manager.maze, (13, 7)))
+        print(MazeManager.getReachablePaths(manager.maze, (13, 7)))
 

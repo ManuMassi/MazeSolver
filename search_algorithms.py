@@ -5,12 +5,15 @@ from gui import drawTree
 
 
 def expand(maze, node):
-    states = MazeManager.getReachableStates(maze, node.data)
-    # states = MazeManager.getAdjacentSquares(maze, node.data, SquareType.ROOM)
+    states, paths = MazeManager.getReachablePaths(maze, node.data)
 
     ancestors = [ancestor.data for ancestor in node.ancestors]
 
     nodes = [Node(state) for state in states if state not in ancestors]
+
+    for i, state in enumerate(nodes):
+        node.add_children(state)
+        state.path_cost += len(paths[i])
 
     return nodes
 
@@ -41,10 +44,6 @@ def tree_search(maze, start_state, goal_state, enqueue, max_depth=None):
         else:
             successors = expand(maze, node)
             expanded.append(node)
-
-            for successor in successors:
-                node.add_children(successor)
-                successor.path_cost += len(MazeManager.getPath(maze, node.data, successor.data))
 
             enqueue(successors, fringe)
     drawTree(expanded)
@@ -97,12 +96,12 @@ if __name__ == '__main__':
         manager = MazeManager(10, 10)
         manager.drawMaze(manager.maze, stateSpace=True)
 
-        bfs = breadth_first_search(manager.maze, manager.maze.start, manager.maze.end)
         # ucs = uniform_cost_search(manager.maze, manager.maze.start, manager.maze.end)
+        #bfs = breadth_first_search(manager.maze, manager.maze.start, manager.maze.end)
         # A_s = A_star_search(manager.maze, manager.maze.start, manager.maze.end)
-        # dps = iterative_deepening_depth_first_search(manager.maze, manager.maze.start, manager.maze.end)
+        dps = iterative_deepening_depth_first_search(manager.maze, manager.maze.start, manager.maze.end)
 
-        print("Bfs", bfs)
+        # print("culetto", ucs)
 """
 
 """
