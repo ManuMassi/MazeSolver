@@ -81,8 +81,8 @@ class MazeManager:
         plt.yticks(np.arange(-0.5, grid.shape[0], 1))
 
         # Remove tick labels
-        ax.set_yticklabels([])
-        ax.set_xticklabels([])
+        # ax.set_yticklabels([])
+        # ax.set_xticklabels([])
 
         plt.show()
 
@@ -187,7 +187,7 @@ class MazeManager:
                     reachable_states.append(current_adjacent)
                     paths.append(current_path)
 
-                    current_path.clear()
+                    current_path = []
                     room = start
 
                 else:
@@ -196,7 +196,7 @@ class MazeManager:
             else:
                 if room == start:
                     return reachable_states, paths
-                current_path.clear()
+                current_path = []
                 room = start
 
 
@@ -209,5 +209,5 @@ if __name__ == "__main__":
         # print(MazeManager.getPath(manager.maze, (19, 9), (17, 7)))
         # print(MazeManager.getReachableStates(manager.maze, (19, 9)))
         # print(MazeManager.getPath(manager.maze, (19, 9), (17, 7)))
-        print(MazeManager.getReachablePaths(manager.maze, (13, 7)))
+        print(MazeManager.getReachablePaths(manager.maze, (1, 1)))
 
