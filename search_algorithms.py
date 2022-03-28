@@ -30,12 +30,12 @@ def tree_search(maze, start_state, goal_state, enqueue, max_depth=None):
     fringe = [root]
 
     while len(fringe) > 0:
-        # print(fringe)
         node = fringe.pop(0)
-        # print(node, ':', node.path_cost)
 
-        if max_depth and len(node.ancestors) > max_depth - 1:
-            continue
+        if max_depth:
+            curr_depth = len(node.ancestors)
+            if curr_depth > max_depth:
+                continue
 
         if node.data == goal.data:
             solution = node.ancestors.copy()[::-1]
@@ -46,13 +46,13 @@ def tree_search(maze, start_state, goal_state, enqueue, max_depth=None):
             maze.solutions = solution
             return solution
         else:
-            if max_depth and max_depth != 1 and len(node.ancestors) == max_depth - 1:
-                _prune(node)
-            else:
-                successors = expand(maze, node)
-                expanded.append(node)
+            successors = expand(maze, node)
+            expanded.append(node)
 
-                enqueue(successors, fringe)
+            enqueue(successors, fringe)
+
+            if (max_depth and curr_depth == max_depth) or len(node.children) == 0:
+                _prune(node, expanded)
     drawTree(expanded)
     return False
 
@@ -98,19 +98,27 @@ def iterative_deepening_depth_first_search(maze, start_state, goal_state):
     return solution
 
 
-def _prune(node):
-    node.ancestors[0].children.remove(node)
-    node.ancestors.clear()
+def _prune(node, expanded):
+    if node in expanded:
+        expanded.remove(node)
+
+    if len(node.ancestors) > 0:
+        node.ancestors[0].children.remove(node)
+
+        if len(node.ancestors[0].children) == 0:
+            _prune(node.ancestors[0], expanded)
+
+        node.ancestors = []
 
 
 if __name__ == '__main__':
     for i in range(1):
-        manager = MazeManager(5, 5)
+        manager = MazeManager(10, 10)
         manager.drawMaze(manager.maze, stateSpace=True)
 
         # ucs = uniform_cost_search(manager.maze, manager.maze.start, manager.maze.end)
-        A_s = A_star_search(manager.maze, manager.maze.start, manager.maze.end)
+        # A_s = A_star_search(manager.maze, manager.maze.start, manager.maze.end)
         # bfs = breadth_first_search(manager.maze, manager.maze.start, manager.maze.end)
-        # dps = iterative_deepening_depth_first_search(manager.maze, manager.maze.start, manager.maze.end)
+        dps = iterative_deepening_depth_first_search(manager.maze, manager.maze.start, manager.maze.end)
 
-        print("bread", A_s)
+        print("bread", dps)
