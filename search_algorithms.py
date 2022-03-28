@@ -1,6 +1,5 @@
 from maze import MazeManager, SquareType
 from tree import Node
-from mazelib.solve.BacktrackingSolver import BacktrackingSolver
 from gui import drawTree
 
 
@@ -43,9 +42,7 @@ def tree_search(maze, start_state, goal_state, enqueue, max_depth=None):
             return solution
         else:
             if max_depth and max_depth != 1 and len(node.ancestors) == max_depth - 1:
-                node.ancestors[0].children.remove(node)
-                node.ancestors.clear()
-
+                _prune(node)
             else:
                 successors = expand(maze, node)
                 expanded.append(node)
@@ -96,9 +93,14 @@ def iterative_deepening_depth_first_search(maze, start_state, goal_state):
     return solution
 
 
+def _prune(node):
+    node.ancestors[0].children.remove(node)
+    node.ancestors.clear()
+
+
 if __name__ == '__main__':
     for i in range(1):
-        manager = MazeManager(10, 10)
+        manager = MazeManager(5, 5 )
         manager.drawMaze(manager.maze, stateSpace=True)
 
         # ucs = uniform_cost_search(manager.maze, manager.maze.start, manager.maze.end)
@@ -107,6 +109,3 @@ if __name__ == '__main__':
         dps = iterative_deepening_depth_first_search(manager.maze, manager.maze.start, manager.maze.end)
 
         print("culetto", dps)
-"""
-
-"""

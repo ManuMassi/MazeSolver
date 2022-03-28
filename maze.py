@@ -203,7 +203,7 @@ class MazeManager:
 if __name__ == "__main__":
     for i in range(1):
 
-        manager = MazeManager(10, 10)
+        manager = MazeManager(5, 5)
         manager.drawMaze(manager.maze, stateSpace=True, solution=True)
         # print(manager.getReachableStatesIterative(manager.maze, state=(19, 9)))
         # print(MazeManager.getPath(manager.maze, (19, 9), (17, 7)))
