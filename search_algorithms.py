@@ -42,10 +42,15 @@ def tree_search(maze, start_state, goal_state, enqueue, max_depth=None):
             maze.solutions = solution
             return solution
         else:
-            successors = expand(maze, node)
-            expanded.append(node)
+            if max_depth and max_depth != 1 and len(node.ancestors) == max_depth - 1:
+                node.ancestors[0].children.remove(node)
+                node.ancestors.clear()
 
-            enqueue(successors, fringe)
+            else:
+                successors = expand(maze, node)
+                expanded.append(node)
+
+                enqueue(successors, fringe)
     drawTree(expanded)
     return False
 
@@ -97,11 +102,11 @@ if __name__ == '__main__':
         manager.drawMaze(manager.maze, stateSpace=True)
 
         # ucs = uniform_cost_search(manager.maze, manager.maze.start, manager.maze.end)
-        #bfs = breadth_first_search(manager.maze, manager.maze.start, manager.maze.end)
         # A_s = A_star_search(manager.maze, manager.maze.start, manager.maze.end)
+        # bfs = breadth_first_search(manager.maze, manager.maze.start, manager.maze.end)
         dps = iterative_deepening_depth_first_search(manager.maze, manager.maze.start, manager.maze.end)
 
-        # print("culetto", ucs)
+        print("culetto", dps)
 """
 
 """

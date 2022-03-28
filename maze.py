@@ -187,7 +187,7 @@ class MazeManager:
                     reachable_states.append(current_adjacent)
                     paths.append(current_path)
 
-                    current_path = []
+                    current_path.clear()
                     room = start
 
                 else:
@@ -196,7 +196,7 @@ class MazeManager:
             else:
                 if room == start:
                     return reachable_states, paths
-                current_path = []
+                current_path.clear()
                 room = start
 
 
