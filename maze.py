@@ -25,7 +25,7 @@ class MazeManager:
 
     @staticmethod
     def generateMaze(height, width):
-        maze = Maze(12345)
+        maze = Maze()
         maze.generator = AldousBroder(height, width)
         maze.generate()
         maze.generate_entrances()
@@ -80,7 +80,7 @@ class MazeManager:
         plt.xticks(np.arange(-0.5, grid.shape[1], 1))
         plt.yticks(np.arange(-0.5, grid.shape[0], 1))
 
-        # Remove tick labels
+        # # Remove tick labels
         # ax.set_yticklabels([])
         # ax.set_xticklabels([])
 
@@ -209,5 +209,5 @@ if __name__ == "__main__":
         # print(MazeManager.getPath(manager.maze, (19, 9), (17, 7)))
         # print(MazeManager.getReachableStates(manager.maze, (19, 9)))
         # print(MazeManager.getPath(manager.maze, (19, 9), (17, 7)))
-        print(MazeManager.getReachablePaths(manager.maze, (1, 1)))
+        print(MazeManager.getReachablePaths(manager.maze, (4, 3)))
 

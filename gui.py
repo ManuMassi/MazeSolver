@@ -5,12 +5,20 @@ import tkinter
 import os
 
 
-def drawTree(nodes):
-	tree = graphviz.Digraph('tree', format='png')
+def drawTree(nodes, selected_node, directory, filename, goal=None, prune=None):
+	tree = graphviz.Digraph(filename, format='png')
 
 	for node in nodes:
 		# Adds nodes
-		tree.node(str(node.id), str(node.data))
+		if node == selected_node:
+			if goal:
+				tree.node(str(node.id), str(node.data), style="filled", color="green")
+			elif prune:
+				tree.node(str(node.id), str(node.data), style="filled", color="red")
+			else:
+				tree.node(str(node.id), str(node.data), color="yellow")
+		else:
+			tree.node(str(node.id), str(node.data))
 
 		for child in node.children:
 			# Adds child
@@ -19,11 +27,10 @@ def drawTree(nodes):
 			tree.edge(str(node.id), str(child.id))
 
 	# Save tree.png
-	tree.render(directory='.', view=False)
+	tree.render(directory=directory, view=False)
 
-	os.remove('./tree.gv')
-	os.rename('./tree.gv.png', './tree.png')
-
+	os.remove(directory + filename + ".gv")
+	os.rename(directory + filename + ".gv.png", directory + filename + ".png")
 
 
 def changeImage(path, label):
@@ -48,10 +55,9 @@ if __name__ == "__main__":
 	dot.edge('B', 'C', constraint='false')
 	dot.render(directory='./ciao/', view=False)
 
-
 	# Tkinter
-
 	root = Tk()
+
 	label = Label(root)
 	label.pack()
 

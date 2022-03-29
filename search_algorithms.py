@@ -2,6 +2,8 @@ from maze import MazeManager, SquareType
 from tree import Node
 from gui import drawTree
 
+filename = 0
+
 
 def expand(maze, node):
     states, paths = MazeManager.getReachablePaths(maze, node.data)
@@ -23,13 +25,18 @@ def expand(maze, node):
 
 
 def tree_search(maze, start_state, goal_state, enqueue, max_depth=None):
+    global filename
+
     expanded = []
     root = Node(start_state)
     goal = Node(goal_state)
 
     fringe = [root]
 
+    filename = 0
+
     while len(fringe) > 0:
+        filename += 1
         node = fringe.pop(0)
 
         if max_depth:
@@ -38,10 +45,12 @@ def tree_search(maze, start_state, goal_state, enqueue, max_depth=None):
                 continue
 
         if node.data == goal.data:
+            expanded.append(node)
+
             solution = node.ancestors.copy()[::-1]
             solution.append(goal)
 
-            drawTree(expanded)
+            drawTree(expanded, node, "./temp/", str(filename), goal=True)
 
             maze.solutions = solution
             return solution
@@ -51,9 +60,12 @@ def tree_search(maze, start_state, goal_state, enqueue, max_depth=None):
 
             enqueue(successors, fringe)
 
-            if (max_depth and curr_depth == max_depth) or len(node.children) == 0:
-                _prune(node, expanded)
-    drawTree(expanded)
+            if max_depth:
+                if (curr_depth == max_depth) or len(node.children) == 0:
+                    _prune(node, expanded)
+
+            drawTree(expanded, node, "./temp/", str(filename))
+
     return False
 
 
@@ -99,11 +111,16 @@ def iterative_deepening_depth_first_search(maze, start_state, goal_state):
 
 
 def _prune(node, expanded):
+    global filename
+
     if node in expanded:
         expanded.remove(node)
 
     if len(node.ancestors) > 0:
         node.ancestors[0].children.remove(node)
+
+        # filename += 1
+        # drawTree(expanded, node, "./temp/", str(filename), prune=True)
 
         if len(node.ancestors[0].children) == 0:
             _prune(node.ancestors[0], expanded)
@@ -113,7 +130,7 @@ def _prune(node, expanded):
 
 if __name__ == '__main__':
     for i in range(1):
-        manager = MazeManager(10, 10)
+        manager = MazeManager(5, 5)
         manager.drawMaze(manager.maze, stateSpace=True)
 
         # ucs = uniform_cost_search(manager.maze, manager.maze.start, manager.maze.end)
