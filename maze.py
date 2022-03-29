@@ -81,8 +81,10 @@ class MazeManager:
         plt.yticks(np.arange(-0.5, grid.shape[0], 1))
 
         # # Remove tick labels
-        # ax.set_yticklabels([])
-        # ax.set_xticklabels([])
+        ax.set_yticklabels([])
+        ax.set_xticklabels([])
+
+        plt.savefig('maze.png')
 
         plt.show()
 

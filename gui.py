@@ -13,16 +13,18 @@ curr_image = 0
 # 	label.config(image=photoImage)
 # 	label.image = photoImage
 
-def changeImage(label):
+def changeImage(tree_label, root):
 	global curr_image
 	path = './temp/' + str(curr_image) + '.png'
 
+
 	try:
 		photo_image = ImageTk.PhotoImage(Image.open(path))
-		label.config(image=photo_image)
-		label.image = photo_image
+		tree_label.config(image=photo_image)
+		tree_label.image = photo_image
 	except FileNotFoundError:
-		print("Immagini finite")
+		search_ended_txt = Label(root, text='Immagini finite')
+		search_ended_txt.pack()
 	curr_image += 1
 
 
@@ -37,16 +39,21 @@ if __name__ == "__main__":
 
 	# Tkinter
 	root = Tk()
+	root.geometry()
 
-	label = Label(root)
-	label.pack()
+	tree_label = Label(root)
+	tree_label.pack()
 
-	nextButton = tkinter.Button(root, text="Next", command=lambda: changeImage(label))
+	nextButton = tkinter.Button(root, text="Next", command=lambda: changeImage(tree_label, root))
 	nextButton.pack()
 
-	T = Text(root,)
+	changeImage(tree_label, root)
 
-	changeImage(label)
+	maze_label = Label(root)
+	maze_label.pack()
+	maze_img = ImageTk.PhotoImage(Image.open('./maze.png'))
+	maze_label.config(image=maze_img)
+	maze_label.image = maze_img
 
 	root.mainloop()
 
