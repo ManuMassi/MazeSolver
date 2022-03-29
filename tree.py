@@ -8,7 +8,7 @@ class Node:
         self.ancestors = []
         self.path_cost = 0
 
-        self.id = random.randint(0, 100000000)
+        self.id = id(self)
 
     def add_children(self, node):
         if type(node) is not Node:

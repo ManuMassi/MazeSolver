@@ -5,7 +5,7 @@ import tkinter
 import os
 
 
-def drawTree(nodes, selected_node, directory, filename, goal=None, prune=None):
+def drawTree(nodes, selected_node, directory, filename, goal=False, prune=False):
 	tree = graphviz.Digraph(filename, format='png')
 
 	for node in nodes:
@@ -22,7 +22,10 @@ def drawTree(nodes, selected_node, directory, filename, goal=None, prune=None):
 
 		for child in node.children:
 			# Adds child
-			tree.node(str(child.id), str(child.data))
+			if prune and node == selected_node:
+				tree.node(str(child.id), str(child.data), style="filled", color="red")
+			else:
+				tree.node(str(child.id), str(child.data))
 			# Create edge
 			tree.edge(str(node.id), str(child.id))
 
