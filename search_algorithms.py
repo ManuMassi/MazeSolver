@@ -1,6 +1,7 @@
+import graphviz
+
 from maze import MazeManager, SquareType
 from tree import Node
-from gui import drawTree
 import os
 
 filename = 0
@@ -28,7 +29,7 @@ def expand(maze, node):
 def tree_search(maze, start_state, goal_state, enqueue, max_depth=None):
     try:
         for file in os.listdir('./temp'):
-                os.remove('./temp/' + file)
+            os.remove('./temp/' + file)
     except FileNotFoundError:
         pass
 
@@ -135,6 +136,37 @@ def iterative_deepening_depth_first_search(maze, start_state, goal_state):
         max_depth += 1
 
     return solution
+
+
+def drawTree(nodes, selected_node, directory, filename, goal=False, prune=False):
+    tree = graphviz.Digraph(filename, format='png')
+
+    for node in nodes:
+        # Adds nodes
+        if node == selected_node:
+            if goal:
+                tree.node(str(node.id), str(node.data), style="filled", color="green")
+            elif prune:
+                tree.node(str(node.id), str(node.data), style="filled", color="red")
+            else:
+                tree.node(str(node.id), str(node.data), color="yellow")
+        else:
+            tree.node(str(node.id), str(node.data))
+
+        for child in node.children:
+            # Adds child
+            if prune and node == selected_node:
+                tree.node(str(child.id), str(child.data), style="filled", color="red")
+            else:
+                tree.node(str(child.id), str(child.data))
+            # Create edge
+            tree.edge(str(node.id), str(child.id))
+
+    # Save tree.png
+    tree.render(directory=directory, view=False)
+
+    os.remove(directory + filename + ".gv")
+    os.rename(directory + filename + ".gv.png", directory + filename + ".png")
 
 
 if __name__ == '__main__':

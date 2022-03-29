@@ -3,60 +3,37 @@ from tkinter import *
 from PIL import Image, ImageTk
 import tkinter
 import os
+from search_algorithms import MazeManager, breadth_first_search
+
+curr_image = 0
 
 
-def drawTree(nodes, selected_node, directory, filename, goal=False, prune=False):
-	tree = graphviz.Digraph(filename, format='png')
+# def changeImage(path, label):
+# 	photoImage = ImageTk.PhotoImage(Image.open(path))
+# 	label.config(image=photoImage)
+# 	label.image = photoImage
 
-	for node in nodes:
-		# Adds nodes
-		if node == selected_node:
-			if goal:
-				tree.node(str(node.id), str(node.data), style="filled", color="green")
-			elif prune:
-				tree.node(str(node.id), str(node.data), style="filled", color="red")
-			else:
-				tree.node(str(node.id), str(node.data), color="yellow")
-		else:
-			tree.node(str(node.id), str(node.data))
+def changeImage(label):
+	global curr_image
+	path = './temp/' + str(curr_image) + '.png'
 
-		for child in node.children:
-			# Adds child
-			if prune and node == selected_node:
-				tree.node(str(child.id), str(child.data), style="filled", color="red")
-			else:
-				tree.node(str(child.id), str(child.data))
-			# Create edge
-			tree.edge(str(node.id), str(child.id))
-
-	# Save tree.png
-	tree.render(directory=directory, view=False)
-
-	os.remove(directory + filename + ".gv")
-	os.rename(directory + filename + ".gv.png", directory + filename + ".png")
-
-
-def changeImage(path, label):
-	photoImage = ImageTk.PhotoImage(Image.open(path))
-	label.config(image=photoImage)
-	label.image = photoImage
+	try:
+		photo_image = ImageTk.PhotoImage(Image.open(path))
+		label.config(image=photo_image)
+		label.image = photo_image
+	except FileNotFoundError:
+		print("Immagini finite")
+	curr_image += 1
 
 
 if __name__ == "__main__":
-	dot = graphviz.Digraph('img1', format='png')
+	manager = MazeManager(5, 5)
+	manager.drawMaze(manager.maze, stateSpace=True)
 
-	dot.node('A')
-	dot.node('B')
-	dot.node('C')
-
-	dot.edge('A', 'B', constraint='true')
-	dot.edge('A', 'C', constraint='true')
-
-	# Save image
-	dot.render(directory='.', view=False)
-
-	dot.edge('B', 'C', constraint='false')
-	dot.render(directory='./ciao/', view=False)
+	# ucs = uniform_cost_search(manager.maze, manager.maze.start, manager.maze.end)
+	# A_s = A_star_search(manager.maze, manager.maze.start, manager.maze.end)
+	dps = breadth_first_search(manager.maze, manager.maze.start, manager.maze.end)
+	# dps = iterative_deepening_depth_first_search(manager.maze, manager.maze.start, manager.maze.end)
 
 	# Tkinter
 	root = Tk()
@@ -64,10 +41,12 @@ if __name__ == "__main__":
 	label = Label(root)
 	label.pack()
 
-	nextButton = tkinter.Button(root, text="Next", command=lambda: changeImage('./ciao/img1.gv.png', label))
+	nextButton = tkinter.Button(root, text="Next", command=lambda: changeImage(label))
 	nextButton.pack()
 
-	changeImage('./img1.gv.png', label)
+	T = Text(root,)
+
+	changeImage(label)
 
 	root.mainloop()
 
