@@ -7,56 +7,63 @@ curr_image = 0
 
 
 def changeImage(tree_label, root):
-	global curr_image
-	path = './temp/' + str(curr_image) + '.png'
+    global curr_image
+    path = './temp/' + str(curr_image) + '.png'
 
-	try:
-		img = Image.open(path)
-		img.resize((700, 700), Image.ANTIALIAS)
+    try:
+        img = Image.open(path)
 
-		photo_image = ImageTk.PhotoImage(img)
+        width, height = img.size
+        max_width = max_height = 700
 
-		tree_label.config(image=photo_image)
-		tree_label.image = photo_image
+        if width > max_width or height > max_height:
+            ratio = min(max_width / width, max_height / height)
+            new_size = tuple(int(dimension * ratio) for dimension in img.size)
 
-	except FileNotFoundError:
-		# search_ended_txt = Label(root, text='Immagini finite')
-		# search_ended_txt.pack()
-		pass
+            img = img.resize(new_size, Image.ANTIALIAS)
 
-	curr_image += 1
+        photo_image = ImageTk.PhotoImage(img)
+
+        tree_label.config(image=photo_image)
+        tree_label.image = photo_image
+
+    except FileNotFoundError:
+        # search_ended_txt = Label(root, text='Immagini finite')
+        # search_ended_txt.pack()
+        pass
+
+    curr_image += 1
 
 
 if __name__ == "__main__":
-	manager = MazeManager(7, 7)
-	manager.drawMaze(manager.maze, stateSpace=True)
+    manager = MazeManager(9, 9)
+    # manager.drawMaze(manager.maze, stateSpace=True)
 
-	dps = breadth_first_search(manager.maze, manager.maze.start, manager.maze.end)
+    dps = breadth_first_search(manager.maze, manager.maze.start, manager.maze.end)
 
-	# Tkinter
-	root = Tk()
-	root.geometry("1920x1080")
-	root.title("Maze Solver")
-	root.config(bg="lightgrey")
+    # Tkinter
+    root = Tk()
+    root.geometry("1920x1080")
+    root.title("Maze Solver")
+    root.config(bg="lightgrey")
 
-	# Setting next button
-	nextButton = tkinter.Button(root, text="Next", command=lambda: changeImage(tree_label, root))
-	nextButton.pack(pady=50, side=BOTTOM)
+    # Setting next button
+    nextButton = tkinter.Button(root, text="Next", command=lambda: changeImage(tree_label, root))
+    nextButton.pack(pady=50, side=BOTTOM)
 
-	# Setting tree images
-	tree_label = Label(root, width=900, height=700, bg="white", borderwidth=20)
-	tree_label.pack(padx=5, pady=15, side=LEFT, expand=True)
+    # Setting tree images
+    tree_label = Label(root, width=900, height=700, bg="white", borderwidth=20)
+    tree_label.pack(padx=5, pady=15, side=LEFT, expand=True)
 
-	# Setting maze images
-	maze_label = Label(root, width=900, height=700, bg="white", borderwidth=20)
-	maze_label.pack(padx=5, pady=15, side=RIGHT, expand=True)
+    # Setting maze images
+    maze_label = Label(root, width=900, height=700, bg="white", borderwidth=20)
+    maze_label.pack(padx=5, pady=15, side=RIGHT, expand=True)
 
-	maze_img = ImageTk.PhotoImage(Image.open('./maze.png'))
-	maze_label.config(image=maze_img)
-	maze_label.image = maze_img
+    maze_img = ImageTk.PhotoImage(Image.open('./maze.png'))
+    maze_label.config(image=maze_img)
+    maze_label.image = maze_img
 
-	# Starting with first image
-	changeImage(tree_label, root)
+    # Starting with first image
+    changeImage(tree_label, root)
 
-	root.mainloop()
-
+    root.mainloop()
