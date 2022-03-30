@@ -102,7 +102,7 @@ class MazeManager:
             pass
         plt.savefig('./mazes/' + str(filename) + '.png')
 
-        plt.show()
+         # plt.show()
 
     @staticmethod
     def getAdjacentSquares(maze, square, squareType=SquareType.WALL):

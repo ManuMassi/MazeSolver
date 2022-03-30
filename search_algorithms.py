@@ -70,11 +70,12 @@ def tree_search(maze, start_state, goal_state, enqueue, max_depth=None):
 
             enqueue(successors, fringe)
 
+            MazeManager.drawMaze(maze, filename, stateSpace=True, node=node)
+
             if max_depth:
                 if (curr_depth == max_depth) or len(node.children) == 0:
                     _prune(node, expanded, maze)
 
-            MazeManager.drawMaze(maze, filename, stateSpace=True, node=node)
             drawTree(expanded, node, "./temp/", str(filename))
         filename += 1
 
@@ -86,10 +87,7 @@ def _prune(node, expanded, maze):
 
     drawTree(expanded, node, "./temp/", str(filename), prune=True)
 
-    if node in expanded:
-        MazeManager.drawMaze(maze, filename, stateSpace=True, node=node)
-    else:
-        MazeManager.drawMaze(maze, filename, stateSpace=True)
+    MazeManager.drawMaze(maze, filename, stateSpace=True)
 
     filename += 1
 
