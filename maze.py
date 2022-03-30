@@ -25,7 +25,7 @@ class MazeManager:
 
     @staticmethod
     def generateMaze(height, width):
-        maze = Maze()
+        maze = Maze(12345)
         maze.generator = AldousBroder(height, width)
         maze.generate()
         maze.generate_entrances()
@@ -36,29 +36,20 @@ class MazeManager:
         MazeManager.wallBreaker(maze)
 
         maze.state_space = MazeManager.defineStateSpace(maze)
+
+        MazeManager._initialize_colors(maze)
+
         return maze
 
-    @staticmethod
-    def drawMaze(maze, solution=False, stateSpace=False):
-        if type(maze) != Maze:
-            raise TypeError("You must pass a maze to draw")
-
+    def _initialize_colors(maze):
         # Temporary grid where the start and the end are set to 2 and 3
-        grid = maze.grid.copy()
+        maze.colored_grid = maze.grid.copy()
 
-        if stateSpace:
-            for y, x in maze.state_space:
-                grid[y][x] = SquareType.STATE.value
+        for y, x in maze.state_space:
+            maze.colored_grid[y][x] = SquareType.STATE.value
 
-        if solution and maze.solutions:
-            for i, state in enumerate(maze.solutions):
-                if i != len(maze.solutions) - 1:
-                    path = MazeManager.getReachablePaths(maze, state.data, maze.solutions[i + 1].data)
-                    for room in path:
-                        grid[room[0]][room[1]] = SquareType.SOLUTION.value
-
-        grid[maze.start] = SquareType.START.value
-        grid[maze.end] = SquareType.EXIT.value
+        maze.colored_grid[maze.start] = SquareType.START.value
+        maze.colored_grid[maze.end] = SquareType.EXIT.value
 
         # Color map:
         # 0 -> white : empty spaces
@@ -67,18 +58,30 @@ class MazeManager:
         # 3 -> red : exit
         # 4 -> yellow : solution
         # 5 -> purple : state
-        color_map = colors.ListedColormap(['white', 'black', 'blue', 'red', 'yellow', 'purple'])
-        bounds = list(range(0, 7))  # [0, 1, 2, 3, 4, 5]
-        norm = colors.BoundaryNorm(bounds, color_map.N)
+        maze.color_map = colors.ListedColormap(['white', 'black', 'blue', 'red', 'yellow', 'purple'])
+        maze.bounds = list(range(0, 7))  # [0, 1, 2, 3, 4, 5]
+        maze.norm = colors.BoundaryNorm(maze.bounds, maze.color_map.N)
+
+    @staticmethod
+    def drawMaze(maze, solution=False, stateSpace=False):
+        if type(maze) != Maze:
+            raise TypeError("You must pass a maze to draw")
+
+        grid = maze.colored_grid.copy() if stateSpace else maze.grid.copy()
+
+        if solution and maze.solutions:
+            for i, state in enumerate(maze.solutions):
+                if i != len(maze.solutions) - 1:
+                    grid[state.data[0]][state.data[1]] = SquareType.SOLUTION.value
 
         # Draw the maze
         fig, ax = plt.subplots()
-        ax.imshow(grid, cmap=color_map, norm=norm)
+        ax.imshow(grid, cmap=maze.color_map, norm=maze.norm)
 
         # Show grid
         plt.grid(which='major', axis='both')
-        plt.xticks(np.arange(-0.5, grid.shape[1], 1))
-        plt.yticks(np.arange(-0.5, grid.shape[0], 1))
+        plt.xticks(np.arange(-0.5, maze.colored_grid.shape[1], 1))
+        plt.yticks(np.arange(-0.5, maze.colored_grid.shape[0], 1))
 
         # # Remove tick labels
         ax.set_yticklabels([])
@@ -207,9 +210,12 @@ if __name__ == "__main__":
 
         manager = MazeManager(5, 5)
         manager.drawMaze(manager.maze, stateSpace=True, solution=True)
+        manager.drawMaze(manager.maze, stateSpace=True, solution=True)
+        manager.drawMaze(manager.maze, stateSpace=True, solution=True)
+
         # print(manager.getReachableStatesIterative(manager.maze, state=(19, 9)))
         # print(MazeManager.getPath(manager.maze, (19, 9), (17, 7)))
         # print(MazeManager.getReachableStates(manager.maze, (19, 9)))
         # print(MazeManager.getPath(manager.maze, (19, 9), (17, 7)))
-        print(MazeManager.getReachablePaths(manager.maze, (4, 3)))
+        # print(MazeManager.getReachablePaths(manager.maze, (4, 3)))
 

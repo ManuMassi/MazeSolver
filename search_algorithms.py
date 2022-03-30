@@ -175,8 +175,9 @@ if __name__ == '__main__':
         manager.drawMaze(manager.maze, stateSpace=True)
 
         # ucs = uniform_cost_search(manager.maze, manager.maze.start, manager.maze.end)
-        # A_s = A_star_search(manager.maze, manager.maze.start, manager.maze.end)
+        A_s = A_star_search(manager.maze, manager.maze.start, manager.maze.end)
         # dps = breadth_first_search(manager.maze, manager.maze.start, manager.maze.end)
-        dps = iterative_deepening_depth_first_search(manager.maze, manager.maze.start, manager.maze.end)
+        # dps = iterative_deepening_depth_first_search(manager.maze, manager.maze.start, manager.maze.end)
 
-        print("bread", dps)
+        print("soluzione=", manager.maze.solutions)
+        manager.drawMaze(manager.maze, solution=True, stateSpace=True)
