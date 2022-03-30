@@ -1,8 +1,9 @@
-import graphviz
-
 from maze import MazeManager
 from tree import Node
 import os
+
+from utils import drawTree, drawMaze
+
 
 filename = 0
 
@@ -28,8 +29,8 @@ def expand(maze, node):
 
 def tree_search(maze, start_state, goal_state, enqueue, max_depth=None):
     try:
-        for file in os.listdir('./temp'):
-            os.remove('./temp/' + file)
+        for file in os.listdir('./trees'):
+            os.remove('./trees/' + file)
         for file in os.listdir('./mazes'):
             os.remove('./mazes/' + file)
     except FileNotFoundError:
@@ -61,8 +62,8 @@ def tree_search(maze, start_state, goal_state, enqueue, max_depth=None):
 
             maze.solutions = solution
 
-            manager.drawMaze(manager.maze, filename, solution=True, stateSpace=True)
-            drawTree(expanded, node, "./temp/", str(filename), goal=True)
+            drawMaze(maze, filename, solution=True, stateSpace=True)
+            drawTree(expanded, node, "./trees/", str(filename), goal=True)
             return solution
         else:
             successors = expand(maze, node)
@@ -70,8 +71,8 @@ def tree_search(maze, start_state, goal_state, enqueue, max_depth=None):
 
             enqueue(successors, fringe)
 
-            MazeManager.drawMaze(maze, filename, stateSpace=True, node=node)
-            drawTree(expanded, node, "./temp/", str(filename))
+            drawMaze(maze, filename, stateSpace=True, node=node)
+            drawTree(expanded, node, "./trees/", str(filename))
 
             if max_depth:
                 if (curr_depth == max_depth) or len(node.children) == 0:
@@ -87,11 +88,9 @@ def _prune(node, expanded, maze):
 
     filename += 1
 
-    drawTree(expanded, node, "./temp/", str(filename), prune=True)
+    drawTree(expanded, node, "./trees/", str(filename), prune=True)
 
-    MazeManager.drawMaze(maze, filename, stateSpace=True, node=node)
-
-
+    drawMaze(maze, filename, stateSpace=True, node=node)
 
     if node in expanded:
         expanded.remove(node)
@@ -144,46 +143,3 @@ def iterative_deepening_depth_first_search(maze, start_state, goal_state):
         max_depth += 1
 
     return solution
-
-
-def drawTree(nodes, selected_node, directory, filename, goal=False, prune=False):
-    tree = graphviz.Digraph(filename, format='png')
-
-    for node in nodes:
-        # Adds nodes
-        if node == selected_node:
-            if goal:
-                tree.node(str(node.id), str(node.data), style="filled", color="green")
-            elif prune:
-                tree.node(str(node.id), str(node.data), style="filled", color="red")
-            else:
-                tree.node(str(node.id), str(node.data), color="yellow")
-        else:
-            tree.node(str(node.id), str(node.data))
-
-        for child in node.children:
-            # Adds child
-            if prune and node == selected_node:
-                tree.node(str(child.id), str(child.data), style="filled", color="red")
-            else:
-                tree.node(str(child.id), str(child.data))
-            # Create edge
-            tree.edge(str(node.id), str(child.id))
-
-    # Save tree.png
-    tree.render(directory=directory, view=False)
-
-    os.remove(directory + filename + ".gv")
-    os.rename(directory + filename + ".gv.png", directory + filename + ".png")
-
-
-if __name__ == '__main__':
-    for i in range(1):
-        manager = MazeManager(5, 5)
-
-        # ucs = uniform_cost_search(manager.maze, manager.maze.start, manager.maze.end)
-        # A_s = A_star_search(manager.maze, manager.maze.start, manager.maze.end)
-        # dps = breadth_first_search(manager.maze, manager.maze.start, manager.maze.end)
-        dps = iterative_deepening_depth_first_search(manager.maze, manager.maze.start, manager.maze.end)
-
-        # manager.drawMaze(manager.maze, filename, solution=True, stateSpace=True)

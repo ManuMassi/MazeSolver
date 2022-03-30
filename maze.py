@@ -1,13 +1,10 @@
-import os
 from enum import Enum
-
 from matplotlib import colors
+import random
+
+
 from mazelib import Maze
 from mazelib.generate.AldousBroder import AldousBroder
-
-import matplotlib.pyplot as plt
-import numpy as np
-import random
 
 
 class SquareType(Enum):
@@ -26,7 +23,7 @@ class MazeManager:
 
     @staticmethod
     def generateMaze(height, width):
-        maze = Maze(54321)
+        maze = Maze()
         maze.generator = AldousBroder(height, width)
         maze.generate()
         maze.generate_entrances()
@@ -62,47 +59,6 @@ class MazeManager:
         maze.color_map = colors.ListedColormap(['white', 'black', 'blue', 'red', 'yellow', 'purple'])
         maze.bounds = list(range(0, 7))  # [0, 1, 2, 3, 4, 5]
         maze.norm = colors.BoundaryNorm(maze.bounds, maze.color_map.N)
-
-    @staticmethod
-    def drawMaze(maze, filename, solution=False, stateSpace=False, node=None):
-        if type(maze) != Maze:
-            raise TypeError("You must pass a maze to draw")
-
-        grid = maze.colored_grid.copy() if stateSpace else maze.grid.copy()
-
-        if solution and maze.solutions:
-            for i, state in enumerate(maze.solutions):
-                if i != len(maze.solutions) - 1:
-                    reach_states, paths = MazeManager.getReachablePaths(maze, state.data)
-                    index = reach_states.index(maze.solutions[i+1].data)
-                    path = paths[index]
-                    for room in path:
-                        if room != maze.end:
-                            grid[room[0]][room[1]] = SquareType.SOLUTION.value
-
-        if node:
-            grid[node.data[0]][node.data[1]] = SquareType.SOLUTION.value
-
-        # Draw the maze
-        fig, ax = plt.subplots()
-        ax.imshow(grid, cmap=maze.color_map, norm=maze.norm)
-
-        # Show grid
-        plt.grid(which='major', axis='both')
-        plt.xticks(np.arange(-0.5, maze.colored_grid.shape[1], 1))
-        plt.yticks(np.arange(-0.5, maze.colored_grid.shape[0], 1))
-
-        # # Remove tick labels
-        ax.set_yticklabels([])
-        ax.set_xticklabels([])
-
-        try:
-            os.mkdir('./mazes')
-        except FileExistsError:
-            pass
-        plt.savefig('./mazes/' + str(filename) + '.png')
-
-         # plt.show()
 
     @staticmethod
     def getAdjacentSquares(maze, square, squareType=SquareType.WALL):
@@ -216,16 +172,3 @@ class MazeManager:
                     return reachable_states, paths
                 current_path = []
                 room = start
-
-
-if __name__ == "__main__":
-    for i in range(1):
-
-        manager = MazeManager(5, 5)
-
-        # print(manager.getReachableStatesIterative(manager.maze, state=(19, 9)))
-        # print(MazeManager.getPath(manager.maze, (19, 9), (17, 7)))
-        # print(MazeManager.getReachableStates(manager.maze, (19, 9)))
-        # print(MazeManager.getPath(manager.maze, (19, 9), (17, 7)))
-        # print(MazeManager.getReachablePaths(manager.maze, (4, 3)))
-
