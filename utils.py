@@ -47,8 +47,9 @@ def drawMaze(maze, filename, solution=False, stateSpace=False, node=None):
     plt.savefig('./mazes/' + str(filename) + '.png')
 
 
-def drawTree(nodes, selected_node, directory, filename, goal=False, prune=False):
+def drawTree(nodes, selected_node, filename, goal=False, prune=False):
     tree = graphviz.Digraph(filename, format='png')
+    directory = './trees/'
 
     for node in nodes:
         # Adds nodes
@@ -77,3 +78,12 @@ def drawTree(nodes, selected_node, directory, filename, goal=False, prune=False)
     os.remove(directory + filename + ".gv")
     os.rename(directory + filename + ".gv.png", directory + filename + ".png")
 
+
+def images_cleanup():
+    try:
+        for file in os.listdir('./trees'):
+            os.remove('./trees/' + file)
+        for file in os.listdir('./mazes'):
+            os.remove('./mazes/' + file)
+    except FileNotFoundError:
+        pass
