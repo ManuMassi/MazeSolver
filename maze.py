@@ -3,7 +3,7 @@ from enum import Enum
 from matplotlib import colors
 from mazelib import Maze
 from mazelib.generate.AldousBroder import AldousBroder
-from mazelib.solve.ShortestPaths import ShortestPaths
+
 import matplotlib.pyplot as plt
 import numpy as np
 import random
@@ -25,7 +25,7 @@ class MazeManager:
 
     @staticmethod
     def generateMaze(height, width):
-        maze = Maze(12345)
+        maze = Maze()
         maze.generator = AldousBroder(height, width)
         maze.generate()
         maze.generate_entrances()
@@ -63,7 +63,7 @@ class MazeManager:
         maze.norm = colors.BoundaryNorm(maze.bounds, maze.color_map.N)
 
     @staticmethod
-    def drawMaze(maze, solution=False, stateSpace=False):
+    def drawMaze(maze, filename, solution=False, stateSpace=False, node=None):
         if type(maze) != Maze:
             raise TypeError("You must pass a maze to draw")
 
@@ -72,7 +72,15 @@ class MazeManager:
         if solution and maze.solutions:
             for i, state in enumerate(maze.solutions):
                 if i != len(maze.solutions) - 1:
-                    grid[state.data[0]][state.data[1]] = SquareType.SOLUTION.value
+                    reach_states, paths = MazeManager.getReachablePaths(maze, state.data)
+                    index = reach_states.index(maze.solutions[i+1].data)
+                    path = paths[index]
+                    for room in path:
+                        if room != maze.end:
+                            grid[room[0]][room[1]] = SquareType.SOLUTION.value
+
+        if node:
+            grid[node.data[0]][node.data[1]] = SquareType.SOLUTION.value
 
         # Draw the maze
         fig, ax = plt.subplots()
@@ -87,7 +95,7 @@ class MazeManager:
         ax.set_yticklabels([])
         ax.set_xticklabels([])
 
-        plt.savefig('maze.png')
+        plt.savefig('./mazes/' + str(filename) + '.png')
 
         plt.show()
 
