@@ -1,3 +1,4 @@
+import os
 from enum import Enum
 
 from matplotlib import colors
@@ -95,6 +96,10 @@ class MazeManager:
         ax.set_yticklabels([])
         ax.set_xticklabels([])
 
+        try:
+            os.mkdir('./mazes')
+        except FileExistsError:
+            pass
         plt.savefig('./mazes/' + str(filename) + '.png')
 
         plt.show()
@@ -217,9 +222,6 @@ if __name__ == "__main__":
     for i in range(1):
 
         manager = MazeManager(5, 5)
-        manager.drawMaze(manager.maze, stateSpace=True, solution=True)
-        manager.drawMaze(manager.maze, stateSpace=True, solution=True)
-        manager.drawMaze(manager.maze, stateSpace=True, solution=True)
 
         # print(manager.getReachableStatesIterative(manager.maze, state=(19, 9)))
         # print(MazeManager.getPath(manager.maze, (19, 9), (17, 7)))

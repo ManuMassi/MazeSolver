@@ -30,6 +30,8 @@ def tree_search(maze, start_state, goal_state, enqueue, max_depth=None):
     try:
         for file in os.listdir('./temp'):
             os.remove('./temp/' + file)
+        for file in os.listdir('/mazes'):
+            os.remove('./mazes/' + file)
     except FileNotFoundError:
         pass
 
@@ -46,8 +48,6 @@ def tree_search(maze, start_state, goal_state, enqueue, max_depth=None):
     while len(fringe) > 0:
         node = fringe.pop(0)
 
-        MazeManager.drawMaze(maze, filename, stateSpace=True, node=node)
-
         if max_depth:
             curr_depth = len(node.ancestors)
             if curr_depth > max_depth:
@@ -59,9 +59,10 @@ def tree_search(maze, start_state, goal_state, enqueue, max_depth=None):
             solution = node.ancestors.copy()[::-1]
             solution.append(goal)
 
-            drawTree(expanded, node, "./temp/", str(filename), goal=True)
-
             maze.solutions = solution
+
+            manager.drawMaze(manager.maze, filename, solution=True, stateSpace=True)
+            drawTree(expanded, node, "./temp/", str(filename), goal=True)
             return solution
         else:
             successors = expand(maze, node)
@@ -71,18 +72,20 @@ def tree_search(maze, start_state, goal_state, enqueue, max_depth=None):
 
             if max_depth:
                 if (curr_depth == max_depth) or len(node.children) == 0:
-                    _prune(node, expanded)
+                    _prune(node, expanded, maze)
 
+            MazeManager.drawMaze(maze, filename, stateSpace=True, node=node)
             drawTree(expanded, node, "./temp/", str(filename))
         filename += 1
 
     return False
 
 
-def _prune(node, expanded):
+def _prune(node, expanded, maze):
     global filename
 
     drawTree(expanded, node, "./temp/", str(filename), prune=True)
+    MazeManager.drawMaze(maze, filename, stateSpace=True, node=node)
     filename += 1
 
     if node in expanded:
@@ -92,7 +95,7 @@ def _prune(node, expanded):
         node.ancestors[0].children.remove(node)
 
         if len(node.ancestors[0].children) == 0:
-            _prune(node.ancestors[0], expanded)
+            _prune(node.ancestors[0], expanded, maze)
 
         node.ancestors = []
 
@@ -178,4 +181,4 @@ if __name__ == '__main__':
         # dps = breadth_first_search(manager.maze, manager.maze.start, manager.maze.end)
         dps = iterative_deepening_depth_first_search(manager.maze, manager.maze.start, manager.maze.end)
 
-        manager.drawMaze(manager.maze, filename, solution=True, stateSpace=True)
+        # manager.drawMaze(manager.maze, filename, solution=True, stateSpace=True)
