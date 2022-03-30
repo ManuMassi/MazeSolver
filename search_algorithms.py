@@ -30,7 +30,7 @@ def tree_search(maze, start_state, goal_state, enqueue, max_depth=None):
     try:
         for file in os.listdir('./temp'):
             os.remove('./temp/' + file)
-        for file in os.listdir('/mazes'):
+        for file in os.listdir('./mazes'):
             os.remove('./mazes/' + file)
     except FileNotFoundError:
         pass
@@ -85,7 +85,12 @@ def _prune(node, expanded, maze):
     global filename
 
     drawTree(expanded, node, "./temp/", str(filename), prune=True)
-    MazeManager.drawMaze(maze, filename, stateSpace=True, node=node)
+
+    if node in expanded:
+        MazeManager.drawMaze(maze, filename, stateSpace=True, node=node)
+    else:
+        MazeManager.drawMaze(maze, filename, stateSpace=True)
+
     filename += 1
 
     if node in expanded:
