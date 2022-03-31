@@ -1,4 +1,3 @@
-
 import tkinter as tk
 from tkinter import font as tkfont
 import sys
@@ -27,7 +26,7 @@ class SampleApp(tk.Tk):
         container.grid_columnconfigure(0, weight=1)
 
         self.frames = {}
-        for F in (StartPage, MazeSelectPage, SizeSelectPage):
+        for F in (StartPage, MazeSelectPage, SizeSelectPage, AlgorithmSelectPage, SolverPage):
             page_name = F.__name__
             frame = F(parent=container, controller=self)
             self.frames[page_name] = frame
@@ -48,7 +47,6 @@ class SampleApp(tk.Tk):
 
     def initialize_maze(self, default=True, width=5, height=5):
         self.maze = MazeManager.generateMaze(height, width)
-        print('ciao')
 
 
 class StartPage(tk.Frame):
@@ -61,7 +59,7 @@ class StartPage(tk.Frame):
         label.pack(side="top", fill="x", pady=10)
 
         button1 = tk.Button(self, text="START",
-                            command=lambda: controller.show_frame("PageOne"))
+                            command=lambda: controller.show_frame("MazeSelectPage"))
         button2 = tk.Button(self, text="QUIT",
                             command=lambda: sys.exit())
         button1.pack()
@@ -77,11 +75,11 @@ class MazeSelectPage(tk.Frame):
         label.pack(side="top", fill="x", pady=10)
 
         random_maze_button = tk.Button(self, text="Generate random maze",
-                           command=lambda: controller.show_frame("StartPage"))
+                                       command=lambda: controller.show_frame("SizeSelectPage"))
         random_maze_button.pack()
 
         default_maze_button = tk.Button(self, text="Use default maze (5x5)",
-                           command=lambda: controller.initialize_maze())
+                                        command=lambda: controller.initialize_maze())
         default_maze_button.pack()
 
 
@@ -90,14 +88,15 @@ class SizeSelectPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
-        label = tk.Label(self, text="This is page 2", font=controller.title_font)
+        label = tk.Label(self, text="Select the maze size", font=controller.title_font)
         label.pack(side="top", fill="x", pady=10)
-        button = tk.Button(self, text="Go to the start page",
-                           command=lambda: controller.show_frame("StartPage"))
+
+        button = tk.Button(self, text="Culetto",
+                           command=lambda: print('Aurora è BELLISSIMA'))
         button.pack()
 
 
-class AlgorithmSelectpage(tk.Frame):
+class AlgorithmSelectPage(tk.Frame):
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
