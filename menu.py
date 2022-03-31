@@ -39,6 +39,7 @@ class SampleApp(tk.Tk):
         self.show_frame("StartPage")
 
         self.maze = None
+        self.algorithm = None
 
     def show_frame(self, page_name):
         # Show a frame for the given page name
@@ -47,6 +48,15 @@ class SampleApp(tk.Tk):
 
     def initialize_maze(self, width=5, height=5):
         self.maze = MazeManager.generateMaze(height, width)
+
+    def setAlgorithm(self, algorithm):
+        if algorithm != breadth_first_search or \
+                algorithm != A_star_search or \
+                algorithm != uniform_cost_search or \
+                algorithm != iterative_deepening_depth_first_search:
+            raise TypeError("Algorithm not valid")
+
+        self.algorithm = algorithm
 
 
 class StartPage(tk.Frame):
@@ -79,8 +89,12 @@ class MazeSelectPage(tk.Frame):
         random_maze_button.pack()
 
         default_maze_button = tk.Button(self, text="Use default maze (5x5)",
-                                        command=lambda: controller.initialize_maze())
+                                        command=lambda: self.selectMaze())
         default_maze_button.pack()
+
+    def selectMaze(self):
+        self.controller.initialize_maze()
+        self.controller.show_frame("AlgorithmSelectPage")
 
 
 class SizeSelectPage(tk.Frame):
@@ -92,16 +106,24 @@ class SizeSelectPage(tk.Frame):
         label.pack(side="top", fill="x", pady=10)
 
         option_list = [str(i) + "x" + str(i) for i in range(3, 16)]
-        default_value = tk.StringVar(self)
-        default_value.set("Select maze dimension")
+        input_value = tk.StringVar(self)
+        input_value.set("Select maze dimension")
 
-        dropdown_menu = tk.OptionMenu(self, default_value, *option_list)
+        dropdown_menu = tk.OptionMenu(self, input_value, *option_list)
         dropdown_menu.pack()
 
-        button = tk.Button(self, text="Create Maze",
-                           command=lambda: controller.initialize_maze(width=int(default_value.get()[0]),
-                                                                      height=int(default_value.get()[2])))
+        button = tk.Button(self, text="Create Maze", command=lambda: self.selectMaze(input_value))
         button.pack()
+
+    def selectMaze(self, input_value):
+
+        if input_value.get()[1] != 'x':
+            size = int(input_value.get()[0:2])
+        else:
+            size = int(input_value.get()[0])
+
+        self.controller.initialize_maze(width=size, height=size)
+        self.controller.show_frame("AlgorithmSelectPage")
 
 
 class AlgorithmSelectPage(tk.Frame):
@@ -109,11 +131,28 @@ class AlgorithmSelectPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
-        label = tk.Label(self, text="This is page 2", font=controller.title_font)
+        label = tk.Label(self, text="Choose an algorithm", font=controller.title_font)
         label.pack(side="top", fill="x", pady=10)
-        button = tk.Button(self, text="Go to the start page",
-                           command=lambda: controller.show_frame("StartPage"))
-        button.pack()
+
+        bfs_button = tk.Button(self, text="Breadth First Search",
+                               command=lambda: self.selectAlgorithm(breadth_first_search))
+        bfs_button.pack()
+
+        a_s_button = tk.Button(self, text="A* Search",
+                               command=lambda: self.selectAlgorithm(A_star_search))
+        a_s_button.pack()
+
+        ucs_button = tk.Button(self, text="Uniform Cost Search",
+                               command=lambda: self.selectAlgorithm(uniform_cost_search))
+        ucs_button.pack()
+
+        iddfs_button = tk.Button(self, text="Iterative Deepening Depth First Search",
+                                 command=lambda: self.selectAlgorithm(iterative_deepening_depth_first_search))
+        iddfs_button.pack()
+
+    def selectAlgorithm(self, algorithm):
+        self.controller.setAlgorithm(algorithm)
+        self.controller.show_frame("SolverPage")
 
 
 class SolverPage(tk.Frame):
@@ -121,11 +160,9 @@ class SolverPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
-        label = tk.Label(self, text="This is page 2", font=controller.title_font)
+        label = tk.Label(self, text="SolverPage", font=controller.title_font)
         label.pack(side="top", fill="x", pady=10)
-        button = tk.Button(self, text="Go to the start page",
-                           command=lambda: controller.show_frame("StartPage"))
-        button.pack()
+
 
 
 if __name__ == "__main__":
