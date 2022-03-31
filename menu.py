@@ -1,11 +1,15 @@
 import tkinter as tk
+from tkinter import ttk
 from tkinter import font as tkfont
+
 import sys
+
+from maze import MazeManager
+from gui import changeImage
 from search_algorithms import breadth_first_search, \
     A_star_search, \
     uniform_cost_search, \
     iterative_deepening_depth_first_search
-from maze import MazeManager
 
 
 class SampleApp(tk.Tk):
@@ -50,13 +54,16 @@ class SampleApp(tk.Tk):
         self.maze = MazeManager.generateMaze(height, width)
 
     def setAlgorithm(self, algorithm):
-        if algorithm != breadth_first_search or \
-                algorithm != A_star_search or \
-                algorithm != uniform_cost_search or \
+        if algorithm != breadth_first_search and \
+                algorithm != A_star_search and \
+                algorithm != uniform_cost_search and \
                 algorithm != iterative_deepening_depth_first_search:
             raise TypeError("Algorithm not valid")
 
         self.algorithm = algorithm
+
+        self.algorithm(self.maze, self.maze.start, self.maze.end)
+
 
 
 class StartPage(tk.Frame):
@@ -117,7 +124,7 @@ class SizeSelectPage(tk.Frame):
 
     def selectMaze(self, input_value):
 
-        if input_value.get()[1] != 'x':
+        if input_value.get()[1] != 'x' and input_value.get()[0] != 's':
             size = int(input_value.get()[0:2])
         else:
             size = int(input_value.get()[0])
@@ -163,6 +170,22 @@ class SolverPage(tk.Frame):
         label = tk.Label(self, text="SolverPage", font=controller.title_font)
         label.pack(side="top", fill="x", pady=10)
 
+        # Setting buttons
+        nextButton = ttk.Button(self, style="TButton", text="Next", command=lambda: changeImage(tree_label, maze_label))
+        nextButton.pack(pady=50, side=tk.BOTTOM)
+
+        # Setting tree images
+        tree_label = tk.Label(self, width=900, height=700, bg="white", borderwidth=20)
+        tree_label.pack(padx=5, pady=15, side=tk.LEFT, expand=True)
+
+        # Setting maze images
+        maze_label = tk.Label(self, width=700, height=700, bg="white", borderwidth=20)
+        maze_label.pack(padx=5, pady=15, side=tk.RIGHT, expand=True)
+
+        # Setting styles
+        button_style = ttk.Style(self)
+        button_style.theme_use('classic')
+        button_style.configure("TButton", background='#afccfa', borderwidth=0.1, font=('Helvetica', 40))
 
 
 if __name__ == "__main__":
