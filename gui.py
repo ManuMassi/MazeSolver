@@ -49,6 +49,14 @@ def resizeImage(img, max_width, max_height):
     return img
 
 
+def showImage(path, label):
+    img = resizeImage(Image.open(path), 700, 700)
+    photo_image = ImageTk.PhotoImage(img)
+
+    label.config(image=photo_image)
+    label.image = photo_image
+
+
 if __name__ == "__main__":
     manager = MazeManager(7, 7)
 

@@ -22,8 +22,8 @@ class MazeManager:
         self.maze = self.generateMaze(height, width)
 
     @staticmethod
-    def generateMaze(height, width):
-        maze = Maze()
+    def generateMaze(height, width, seed=None):
+        maze = Maze(seed)
         maze.generator = AldousBroder(height, width)
         maze.generate()
         maze.generate_entrances()

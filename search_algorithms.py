@@ -63,6 +63,10 @@ def tree_search(maze, start_state, goal_state, enqueue, max_depth=None):
     fringe = [root]
     expanded = []
 
+    drawMaze(maze, filename)
+    drawTree(fringe, selected_node=root, filename=str(filename))
+    filename += 1
+
     while len(fringe) > 0:
         # Remove first state from the fringe
         node = fringe.pop(0)

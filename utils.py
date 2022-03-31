@@ -14,6 +14,9 @@ def drawMaze(maze, filename, solution=False, stateSpace=False, node=None):
 
     grid = maze.colored_grid.copy() if stateSpace else maze.grid.copy()
 
+    grid[maze.start] = SquareType.START.value
+    grid[maze.end] = SquareType.EXIT.value
+
     if solution and maze.solutions:
         for i, state in enumerate(maze.solutions):
             if i != len(maze.solutions) - 1:
@@ -24,7 +27,7 @@ def drawMaze(maze, filename, solution=False, stateSpace=False, node=None):
                     if room != maze.end:
                         grid[room[0]][room[1]] = SquareType.SOLUTION.value
 
-    if node:
+    if node is not None:
         grid[node.data[0]][node.data[1]] = SquareType.SOLUTION.value
 
     # Draw the maze

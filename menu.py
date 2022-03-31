@@ -5,11 +5,12 @@ from tkinter import font as tkfont
 import sys
 
 from maze import MazeManager
-from gui import changeImage
+from gui import changeImage, showImage
 from search_algorithms import breadth_first_search, \
     A_star_search, \
     uniform_cost_search, \
     iterative_deepening_depth_first_search
+from utils import drawMaze
 
 
 class SampleApp(tk.Tk):
@@ -51,7 +52,7 @@ class SampleApp(tk.Tk):
         frame.tkraise()
 
     def initialize_maze(self, width=5, height=5):
-        self.maze = MazeManager.generateMaze(height, width)
+        self.maze = MazeManager.generateMaze(height, width, seed=12345)
 
     def setAlgorithm(self, algorithm):
         if algorithm != breadth_first_search and \
@@ -63,7 +64,6 @@ class SampleApp(tk.Tk):
         self.algorithm = algorithm
 
         self.algorithm(self.maze, self.maze.start, self.maze.end)
-
 
 
 class StartPage(tk.Frame):
@@ -171,8 +171,14 @@ class SolverPage(tk.Frame):
         label.pack(side="top", fill="x", pady=10)
 
         # Setting buttons
-        nextButton = ttk.Button(self, style="TButton", text="Next", command=lambda: changeImage(tree_label, maze_label))
+        nextButton = ttk.Button(self, style="TButton", text="Start",
+                                command=lambda: [changeImage(tree_label, maze_label),
+                                                 self.changeButtonName(nextButton)])
         nextButton.pack(pady=50, side=tk.BOTTOM)
+
+        home_button = tk.Button(self, text="Return home",
+                                command=lambda: controller.show_frame("StartPage"))
+        home_button.pack(pady=50, side=tk.BOTTOM)
 
         # Setting tree images
         tree_label = tk.Label(self, width=900, height=700, bg="white", borderwidth=20)
@@ -183,9 +189,14 @@ class SolverPage(tk.Frame):
         maze_label.pack(padx=5, pady=15, side=tk.RIGHT, expand=True)
 
         # Setting styles
-        button_style = ttk.Style(self)
+        button_style = ttk.Style()
         button_style.theme_use('classic')
         button_style.configure("TButton", background='#afccfa', borderwidth=0.1, font=('Helvetica', 40))
+
+    @staticmethod
+    def changeButtonName(button):
+        if button['text'] == 'Start':
+            button['text'] = 'Next'
 
 
 if __name__ == "__main__":
