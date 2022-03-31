@@ -45,7 +45,7 @@ class SampleApp(tk.Tk):
         frame = self.frames[page_name]
         frame.tkraise()
 
-    def initialize_maze(self, default=True, width=5, height=5):
+    def initialize_maze(self, width=5, height=5):
         self.maze = MazeManager.generateMaze(height, width)
 
 
@@ -91,8 +91,16 @@ class SizeSelectPage(tk.Frame):
         label = tk.Label(self, text="Select the maze size", font=controller.title_font)
         label.pack(side="top", fill="x", pady=10)
 
-        button = tk.Button(self, text="Culetto",
-                           command=lambda: print('Aurora è BELLISSIMA'))
+        option_list = [str(i) + "x" + str(i) for i in range(3, 16)]
+        default_value = tk.StringVar(self)
+        default_value.set("Select maze dimension")
+
+        dropdown_menu = tk.OptionMenu(self, default_value, *option_list)
+        dropdown_menu.pack()
+
+        button = tk.Button(self, text="Create Maze",
+                           command=lambda: controller.initialize_maze(width=int(default_value.get()[0]),
+                                                                      height=int(default_value.get()[2])))
         button.pack()
 
 
