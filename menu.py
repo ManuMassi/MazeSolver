@@ -1,5 +1,4 @@
 import tkinter as tk
-from tkinter import ttk
 from tkinter import font as tkfont
 
 import sys
@@ -10,7 +9,6 @@ from search_algorithms import breadth_first_search, \
     A_star_search, \
     uniform_cost_search, \
     iterative_deepening_depth_first_search
-from utils import drawMaze
 
 
 class SampleApp(tk.Tk):
@@ -72,15 +70,14 @@ class StartPage(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.controller = controller
 
-        label = tk.Label(self, text="Welcome to MazeSolver", font=controller.title_font)
-        label.pack(side="top", fill="x", pady=10)
+        tk.Label(self, text="Welcome to MazeSolver", font=controller.title_font).place(relx=0.5, rely=0.4,
+                                                                                       anchor=tk.CENTER)
 
-        button1 = tk.Button(self, text="START",
-                            command=lambda: controller.show_frame("MazeSelectPage"))
-        button2 = tk.Button(self, text="QUIT",
-                            command=lambda: sys.exit())
-        button1.pack()
-        button2.pack()
+        tk.Button(self, text="START", height=1, width=15,
+                  command=lambda: controller.show_frame("MazeSelectPage")).place(relx=0.5, rely=0.45, anchor=tk.CENTER)
+
+        tk.Button(self, text="QUIT", height=1, width=15,
+                  command=lambda: sys.exit()).place(relx=0.5, rely=0.48, anchor=tk.CENTER)
 
 
 class MazeSelectPage(tk.Frame):
@@ -88,16 +85,14 @@ class MazeSelectPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
-        label = tk.Label(self, text="MazeSolver", font=controller.title_font)
-        label.pack(side="top", fill="x", pady=10)
 
-        random_maze_button = tk.Button(self, text="Generate random maze",
-                                       command=lambda: controller.show_frame("SizeSelectPage"))
-        random_maze_button.pack()
+        tk.Label(self, text="MazeSolver", font=controller.title_font).place(relx=0.5, rely=0.4, anchor=tk.CENTER)
 
-        default_maze_button = tk.Button(self, text="Use default maze (5x5)",
-                                        command=lambda: self.selectMaze())
-        default_maze_button.pack()
+        tk.Button(self, text="Select maze size", height=1, width=15,
+                  command=lambda: controller.show_frame("SizeSelectPage")).place(relx=0.5, rely=0.45, anchor=tk.CENTER)
+
+        tk.Button(self, text="Use default maze (5x5)", height=1, width=15,
+                  command=lambda: self.selectMaze()).place(relx=0.5, rely=0.48, anchor=tk.CENTER)
 
     def selectMaze(self):
         self.controller.initialize_maze()
@@ -109,18 +104,18 @@ class SizeSelectPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
-        label = tk.Label(self, text="Select the maze size", font=controller.title_font)
-        label.pack(side="top", fill="x", pady=10)
+
+        tk.Label(self, text="Select the maze size", font=controller.title_font).place(relx=0.5, rely=0.4,
+                                                                                      anchor=tk.CENTER)
 
         option_list = [str(i) + "x" + str(i) for i in range(3, 16)]
         input_value = tk.StringVar(self)
         input_value.set("Select maze dimension")
 
-        dropdown_menu = tk.OptionMenu(self, input_value, *option_list)
-        dropdown_menu.pack()
+        tk.OptionMenu(self, input_value, *option_list).place(relx=0.5, rely=0.45, anchor=tk.CENTER)
 
-        button = tk.Button(self, text="Create Maze", command=lambda: self.selectMaze(input_value))
-        button.pack()
+        tk.Button(self, text="Create Maze", height=1, width=15,
+                  command=lambda: self.selectMaze(input_value)).place(relx=0.5, rely=0.48, anchor=tk.CENTER)
 
     def selectMaze(self, input_value):
 
@@ -138,24 +133,25 @@ class AlgorithmSelectPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
-        label = tk.Label(self, text="Choose an algorithm", font=controller.title_font)
-        label.pack(side="top", fill="x", pady=10)
 
-        bfs_button = tk.Button(self, text="Breadth First Search",
-                               command=lambda: self.selectAlgorithm(breadth_first_search))
-        bfs_button.pack()
+        tk.Label(self, text="Choose an algorithm", font=controller.title_font).place(relx=0.5, rely=0.4,
+                                                                                     anchor=tk.CENTER)
 
-        a_s_button = tk.Button(self, text="A* Search",
-                               command=lambda: self.selectAlgorithm(A_star_search))
-        a_s_button.pack()
+        tk.Button(self, text="Breadth First Search", height=1, width=25,
+                  command=lambda: self.selectAlgorithm(breadth_first_search)).place(relx=0.43, rely=0.45,
+                                                                                    anchor=tk.CENTER)
 
-        ucs_button = tk.Button(self, text="Uniform Cost Search",
-                               command=lambda: self.selectAlgorithm(uniform_cost_search))
-        ucs_button.pack()
+        tk.Button(self, text="A* Search", height=1, width=25,
+                  command=lambda: self.selectAlgorithm(A_star_search)).place(relx=0.57, rely=0.45, anchor=tk.CENTER)
 
-        iddfs_button = tk.Button(self, text="Iterative Deepening Depth First Search",
-                                 command=lambda: self.selectAlgorithm(iterative_deepening_depth_first_search))
-        iddfs_button.pack()
+        tk.Button(self, text="Uniform Cost Search", height=1, width=25,
+                  command=lambda: self.selectAlgorithm(uniform_cost_search)).place(relx=0.43, rely=0.48,
+                                                                                   anchor=tk.CENTER)
+
+        tk.Button(self, text="Iterative Deepening Depth First Search", height=1, width=25,
+                  command=lambda: self.selectAlgorithm(iterative_deepening_depth_first_search)).place(relx=0.57,
+                                                                                                      rely=0.48,
+                                                                                                      anchor=tk.CENTER)
 
     def selectAlgorithm(self, algorithm):
         self.controller.setAlgorithm(algorithm)
@@ -167,31 +163,25 @@ class SolverPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
-        label = tk.Label(self, text="SolverPage", font=controller.title_font)
-        label.pack(side="top", fill="x", pady=10)
+
+        tk.Label(self, text="SolverPage", font=controller.title_font).pack(side="top", fill="x", pady=10)
 
         # Setting buttons
-        nextButton = ttk.Button(self, style="TButton", text="Start",
-                                command=lambda: [changeImage(tree_label, maze_label),
-                                                 self.changeButtonName(nextButton)])
-        nextButton.pack(pady=50, side=tk.BOTTOM)
+        nextButton = tk.Button(self, text="Start", height=1, width=15,
+                               command=lambda: [changeImage(tree_label, maze_label),
+                                                self.changeButtonName(nextButton)])
+        nextButton.pack(pady=30, side=tk.BOTTOM)
 
-        home_button = tk.Button(self, text="Return home",
-                                command=lambda: controller.show_frame("StartPage"))
-        home_button.pack(pady=50, side=tk.BOTTOM)
+        tk.Button(self, text="Return home", height=1, width=15,
+                  command=lambda: controller.show_frame("StartPage")).pack(side=tk.RIGHT, padx=100, pady=50)
 
         # Setting tree images
-        tree_label = tk.Label(self, width=900, height=700, bg="white", borderwidth=20)
+        tree_label = tk.Label(self, width=900, height=700, bg="white")
         tree_label.pack(padx=5, pady=15, side=tk.LEFT, expand=True)
 
         # Setting maze images
-        maze_label = tk.Label(self, width=700, height=700, bg="white", borderwidth=20)
+        maze_label = tk.Label(self, width=700, height=700, bg="white")
         maze_label.pack(padx=5, pady=15, side=tk.RIGHT, expand=True)
-
-        # Setting styles
-        button_style = ttk.Style()
-        button_style.theme_use('classic')
-        button_style.configure("TButton", background='#afccfa', borderwidth=0.1, font=('Helvetica', 40))
 
     @staticmethod
     def changeButtonName(button):
