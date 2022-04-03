@@ -39,7 +39,7 @@ def expand(maze, node):
     return successors
 
 
-def tree_search(maze, start_state, goal_state, enqueue, max_depth=None):
+def tree_search(maze, enqueue, max_depth=None, draw=True):
     """
     Generic function that find the solution of a maze using search trees
     :param maze: maze to solve
@@ -47,6 +47,7 @@ def tree_search(maze, start_state, goal_state, enqueue, max_depth=None):
     :param goal_state: the goal room of the maze
     :param enqueue: functions to adds nodes to the fringe. It depends on the actual search algorithm used
     :param max_depth: maximum depth used in the iterative deepening depth first search
+    :param draw: boolean parameter that allows to save images from each step
     :return: a list containing the solution if it founds one, False otherwise
     """
     # Remove all previous images
@@ -56,16 +57,17 @@ def tree_search(maze, start_state, goal_state, enqueue, max_depth=None):
     filename = 0
 
     # Convert root and goal to Node object
-    root = Node(start_state)
-    goal = Node(goal_state)
+    root = Node(maze.start)
+    goal = Node(maze.end)
 
     # Initialize fringe and expanded
     fringe = [root]
     expanded = []
 
-    drawMaze(maze, filename)
-    drawTree(fringe, selected_node=root, filename=str(filename))
-    filename += 1
+    if draw:
+        drawMaze(maze, filename)
+        drawTree(fringe, selected_node=root, filename=str(filename))
+        filename += 1
 
     while len(fringe) > 0:
         # Remove first state from the fringe
@@ -89,9 +91,10 @@ def tree_search(maze, start_state, goal_state, enqueue, max_depth=None):
 
             maze.solutions = solution
 
-            # Save images
-            drawMaze(maze, filename, solution=True, stateSpace=True)
-            drawTree(expanded, node, str(filename), goal=True)
+            if draw:
+                # Save images
+                drawMaze(maze, filename, solution=True, stateSpace=True)
+                drawTree(expanded, node, str(filename), goal=True)
             return solution
         else:
             # Expand the node
@@ -101,14 +104,15 @@ def tree_search(maze, start_state, goal_state, enqueue, max_depth=None):
             # Add the successors to the fringe (it depends on the algorithm)
             enqueue(successors, fringe)
 
-            # Save images
-            drawMaze(maze, filename, stateSpace=True, node=node)
-            drawTree(expanded, node, str(filename))
+            if draw:
+                # Save images
+                drawMaze(maze, filename, stateSpace=True, node=node)
+                drawTree(expanded, node, str(filename))
 
             # Prune the tree in the case of the iterative deepening depth first search
             if max_depth:
                 if (curr_depth == max_depth) or len(node.children) == 0:
-                    _prune(node, expanded, maze)
+                    _prune(node, expanded, maze, draw)
 
         filename += 1
 
@@ -116,7 +120,7 @@ def tree_search(maze, start_state, goal_state, enqueue, max_depth=None):
     return False
 
 
-def _prune(node, expanded, maze):
+def _prune(node, expanded, maze, draw=True):
     """
     Function that prune the node passed as parameter
     :param node: node to prune
@@ -125,11 +129,11 @@ def _prune(node, expanded, maze):
     """
     global filename
 
-    filename += 1
-
-    # Save images
-    drawTree(expanded, node, str(filename), prune=True)
-    drawMaze(maze, filename, stateSpace=True, node=node)
+    if draw:
+        filename += 1
+        # Save images
+        drawTree(expanded, node, str(filename), prune=True)
+        drawMaze(maze, filename, stateSpace=True, node=node)
 
     if node in expanded:
         expanded.remove(node)
@@ -145,34 +149,34 @@ def _prune(node, expanded, maze):
         node.ancestors = []
 
 
-def breadth_first_search(maze, start_state, goal_state):
+def breadth_first_search(maze, draw=True):
     def enqueue(nodes, fringe):
         for node in nodes:
             fringe.append(node)
 
-    return tree_search(maze, start_state, goal_state, enqueue)
+    return tree_search(maze, enqueue, draw=draw)
 
 
-def uniform_cost_search(maze, start_state, goal_state):
+def uniform_cost_search(maze, draw=True):
     def enqueue(nodes, fringe):
         fringe.extend(nodes)
         fringe.sort(key=lambda node: node.path_cost)
 
-    return tree_search(maze, start_state, goal_state, enqueue)
+    return tree_search(maze, enqueue, draw=draw)
 
 
-def A_star_search(maze, start_state, goal_state):
+def A_star_search(maze, draw=True):
     def heuristic(node, goal):
         return abs(node[0] - goal[0]) + abs(node[1] - goal[1])
 
     def enqueue(nodes, fringe):
         fringe.extend(nodes)
-        fringe.sort(key=lambda node: node.path_cost + heuristic(node.data, goal_state))
+        fringe.sort(key=lambda node: node.path_cost + heuristic(node.data, maze.end))
 
-    return tree_search(maze, start_state, goal_state, enqueue)
+    return tree_search(maze, enqueue, draw=draw)
 
 
-def iterative_deepening_depth_first_search(maze, start_state, goal_state):
+def iterative_deepening_depth_first_search(maze, draw=True):
     def enqueue(nodes, fringe):
         for node in nodes:
             fringe.insert(0, node)
@@ -180,7 +184,13 @@ def iterative_deepening_depth_first_search(maze, start_state, goal_state):
     max_depth = 1
     solution = False
     while not solution:
-        solution = tree_search(maze, start_state, goal_state, enqueue, max_depth)
+        solution = tree_search(maze, enqueue, max_depth, draw=draw)
         max_depth += 1
 
     return solution
+
+
+if __name__ == '__main__':
+    maze = MazeManager.generateMaze(5, 5)
+
+    print(breadth_first_search(maze, draw=False))

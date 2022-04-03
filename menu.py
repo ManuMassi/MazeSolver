@@ -61,7 +61,7 @@ class SampleApp(tk.Tk):
 
         self.algorithm = algorithm
 
-        self.algorithm(self.maze, self.maze.start, self.maze.end)
+        self.algorithm(self.maze)
 
 
 class StartPage(tk.Frame):
@@ -172,8 +172,8 @@ class SolverPage(tk.Frame):
                                                 self.changeButtonName(nextButton)])
         nextButton.pack(pady=30, side=tk.BOTTOM)
 
-        tk.Button(self, text="Return home", height=1, width=15,
-                  command=lambda: controller.show_frame("StartPage")).pack(side=tk.RIGHT, padx=100, pady=50)
+        tk.Button(self, text="Quit", height=1, width=15,
+                  command=lambda: sys.exit()).pack(side=tk.BOTTOM, padx=100, pady=0)
 
         # Setting tree images
         tree_label = tk.Label(self, width=900, height=700, bg="white")
