@@ -144,7 +144,7 @@ def _prune(node, expanded, maze, draw=True):
 
         # Prune recursively its parent
         if len(node.ancestors[0].children) == 0:
-            _prune(node.ancestors[0], expanded, maze)
+            _prune(node.ancestors[0], expanded, maze, draw)
 
         node.ancestors = []
 
@@ -184,7 +184,7 @@ def iterative_deepening_depth_first_search(maze, draw=True):
     max_depth = 1
     solution = False
     while not solution:
-        solution = tree_search(maze, enqueue, max_depth, draw=draw)
+        solution = tree_search(maze, enqueue=enqueue, max_depth=max_depth, draw=draw)
         max_depth += 1
 
     return solution
