@@ -43,8 +43,6 @@ def tree_search(maze, enqueue, max_depth=None, draw=True, analysis=False):
     Generic function that find the solution of a maze using search trees
     :param analysis: boolean parameters that allows implementing analysis
     :param maze: maze to solve
-    :param start_state: the starting room of the maze
-    :param goal_state: the goal room of the maze
     :param enqueue: functions to adds nodes to the fringe. It depends on the actual search algorithm used
     :param max_depth: maximum depth used in the iterative deepening depth first search
     :param draw: boolean parameter that allows to save images from each step

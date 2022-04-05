@@ -9,12 +9,30 @@ from search_algorithms import breadth_first_search, \
 
 def analysis(min_size, max_size, n_mazes):
     for size in range(min_size, max_size + 1, 5):
+        analysis_result = {
+            breadth_first_search: {
+                'avg_time': 0,
+                'avg_nodes': 0,
+                'avg_path_cost': 0
+            },
+            uniform_cost_search: {
+                'avg_time': 0,
+                'avg_nodes': 0,
+                'avg_path_cost': 0
+            },
+            A_star_search: {
+                'avg_time': 0,
+                'avg_nodes': 0,
+                'avg_path_cost': 0
+            },
+            iterative_deepening_depth_first_search: {
+                'avg_time': 0,
+                'avg_nodes': 0,
+                'avg_path_cost': 0
+            }
+        }
         for i in range(n_mazes):
-            maze = MazeManager.generateMaze(size, size, 12345)
-
-            avg_time = 0
-            avg_nodes = 0
-            avg_path_cost = 0
+            maze = MazeManager.generateMaze(size, size)
 
             for algorithm in [breadth_first_search, uniform_cost_search,
                               A_star_search, iterative_deepening_depth_first_search]:
@@ -23,21 +41,19 @@ def analysis(min_size, max_size, n_mazes):
                 generated_nodes, path_cost = algorithm(maze, draw=False, analysis=True)[1:]
                 end_time = time.time()
 
-                avg_time += (end_time - start_time)
-                avg_nodes += generated_nodes
-                avg_path_cost += path_cost
+                analysis_result[algorithm]['avg_time'] += (end_time - start_time)
+                analysis_result[algorithm]['avg_nodes'] += generated_nodes
+                analysis_result[algorithm]['avg_path_cost'] += path_cost
 
-            # NIOOOOOOO DA CORRREEEEGGEREEEE
-            avg_time = avg_time / n_mazes
-            avg_nodes = avg_nodes / n_mazes
-            avg_path_cost = avg_path_cost / n_mazes
-            print(f'size: {size}x{size}\n'
-                  f'algorithm: {algorithm.__name__}\n'
-                  f'time: {avg_time}\n'
-                  f'generated_nodes: {avg_nodes}\n'
-                  f'path_cost: {avg_path_cost}\n'
-                  '\n')
+        print("Size", size)
+        for algo in analysis_result.keys():
+            print("Algo:", algo.__name__)
+            for avg in analysis_result[algo].keys():
+                analysis_result[algo][avg] /= n_mazes
+                print(avg, analysis_result[algo][avg])
+            print("\n")
+        print("\n\n")
 
 
 if __name__ == "__main__":
-    analysis(5, 25, 1)
+    analysis(5, 20, n_mazes=30)
