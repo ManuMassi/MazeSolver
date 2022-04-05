@@ -1,7 +1,7 @@
-from maze import MazeManager
+from maze import getReachablePaths
 from tree import Node
 
-from utils import drawTree, drawMaze, images_cleanup
+from gui import drawTree, drawMaze, images_cleanup
 
 # Name of the current file to save to visualize the tree / maze
 filename = 0
@@ -16,7 +16,7 @@ def expand(maze, node):
     """
 
     # Get reachable states and paths from the node to expand
-    states, paths = MazeManager.getReachablePaths(maze, node.data)
+    states, paths = getReachablePaths(maze, node.data)
 
     ancestors = [ancestor.data for ancestor in node.ancestors]
 
@@ -215,9 +215,3 @@ def iterative_deepening_depth_first_search(maze, draw=True, analysis=False):
         return solution, tot_expanded, path_cost
 
     return solution
-
-
-if __name__ == '__main__':
-    maze = MazeManager.generateMaze(5, 5)
-
-    print(breadth_first_search(maze, draw=False))

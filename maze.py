@@ -2,7 +2,6 @@ from enum import Enum
 from matplotlib import colors
 import random
 
-
 from mazelib import Maze
 from mazelib.generate.AldousBroder import AldousBroder
 
@@ -16,159 +15,160 @@ class SquareType(Enum):
     STATE = 5
 
 
-class MazeManager:
+def generateMaze(height, width, seed=None):
+    maze = Maze(seed)
+    maze.generator = AldousBroder(height, width)
+    maze.generate()
+    maze.generate_entrances()
 
-    def __init__(self, height, width):
-        self.maze = self.generateMaze(height, width)
+    maze.start = getAdjacentSquares(maze, maze.start, SquareType.ROOM)[0]
+    maze.end = getAdjacentSquares(maze, maze.end, SquareType.ROOM)[0]
 
-    @staticmethod
-    def generateMaze(height, width, seed=None):
-        maze = Maze(seed)
-        maze.generator = AldousBroder(height, width)
-        maze.generate()
-        maze.generate_entrances()
+    wallBreaker(maze)
 
-        maze.start = MazeManager.getAdjacentSquares(maze, maze.start, SquareType.ROOM)[0]
-        maze.end = MazeManager.getAdjacentSquares(maze, maze.end, SquareType.ROOM)[0]
+    maze.state_space = defineStateSpace(maze)
 
-        MazeManager.wallBreaker(maze)
+    _initialize_colors(maze)
 
-        maze.state_space = MazeManager.defineStateSpace(maze)
+    return maze
 
-        MazeManager._initialize_colors(maze)
 
-        return maze
+def _initialize_colors(maze):
+    # Temporary grid where the start and the end are set to 2 and 3
+    maze.colored_grid = maze.grid.copy()
 
-    def _initialize_colors(maze):
-        # Temporary grid where the start and the end are set to 2 and 3
-        maze.colored_grid = maze.grid.copy()
+    for y, x in maze.state_space:
+        maze.colored_grid[y][x] = SquareType.STATE.value
 
-        for y, x in maze.state_space:
-            maze.colored_grid[y][x] = SquareType.STATE.value
+    maze.colored_grid[maze.start] = SquareType.START.value
+    maze.colored_grid[maze.end] = SquareType.EXIT.value
 
-        maze.colored_grid[maze.start] = SquareType.START.value
-        maze.colored_grid[maze.end] = SquareType.EXIT.value
+    # Color map:
+    # 0 -> white : empty spaces
+    # 1 -> black : walls
+    # 2 -> blue : start
+    # 3 -> red : exit
+    # 4 -> yellow : solution
+    # 5 -> purple : state
+    maze.color_map = colors.ListedColormap(['white', 'black', 'blue', 'red', 'yellow', 'purple'])
+    maze.bounds = list(range(0, 7))  # [0, 1, 2, 3, 4, 5]
+    maze.norm = colors.BoundaryNorm(maze.bounds, maze.color_map.N)
 
-        # Color map:
-        # 0 -> white : empty spaces
-        # 1 -> black : walls
-        # 2 -> blue : start
-        # 3 -> red : exit
-        # 4 -> yellow : solution
-        # 5 -> purple : state
-        maze.color_map = colors.ListedColormap(['white', 'black', 'blue', 'red', 'yellow', 'purple'])
-        maze.bounds = list(range(0, 7))  # [0, 1, 2, 3, 4, 5]
-        maze.norm = colors.BoundaryNorm(maze.bounds, maze.color_map.N)
 
-    @staticmethod
-    def getAdjacentSquares(maze, square, squareType=SquareType.WALL):
-        if type(squareType) is not SquareType:
-            raise TypeError("You must pass a SquareType type")
+def getAdjacentSquares(maze, square, square_type=SquareType.WALL):
+    if type(square_type) is not SquareType:
+        raise TypeError("You must pass a SquareType type")
 
-        y = square[0]
-        x = square[1]
-        adjacent_squares = []
+    y = square[0]
+    x = square[1]
+    adjacent_squares = []
 
-        for i in range(-1, 2, 2):  # [-1, 1]
-            try:
-                if maze.grid[y + i][x] == squareType.value and y + i >= 0:
-                    adjacent_squares.append((y + i, x))
-            except IndexError:
-                pass
+    for i in range(-1, 2, 2):  # [-1, 1]
+        try:
+            if maze.grid[y + i][x] == square_type.value and y + i >= 0:
+                adjacent_squares.append((y + i, x))
+        except IndexError:
+            pass
 
-            try:
-                if maze.grid[y][x + i] == squareType.value and x + i >= 0:
-                    adjacent_squares.append((y, x + i))
-            except IndexError:
-                pass
+        try:
+            if maze.grid[y][x + i] == square_type.value and x + i >= 0:
+                adjacent_squares.append((y, x + i))
+        except IndexError:
+            pass
 
-        return adjacent_squares
+    return adjacent_squares
 
-    @staticmethod
-    def canBreakWall(maze, wall):
-        adjacent_walls = MazeManager.getAdjacentSquares(maze, wall, SquareType.WALL)
 
-        if len(adjacent_walls) != 2:
+def canBreakWall(maze, wall):
+    adjacent_walls = getAdjacentSquares(maze, wall, SquareType.WALL)
+
+    if len(adjacent_walls) != 2:
+        return False
+
+    coords = adjacent_walls[0]
+
+    for adjacentWall in adjacent_walls[1:]:
+        if adjacentWall[0] != coords[0] and adjacentWall[1] != coords[1]:
             return False
+        else:
+            coords = adjacent_walls
 
-        coords = adjacent_walls[0]
+    return True
 
-        for adjacentWall in adjacent_walls[1:]:
-            if adjacentWall[0] != coords[0] and adjacentWall[1] != coords[1]:
-                return False
-            else:
-                coords = adjacent_walls
 
-        return True
+def wallBreaker(maze):
+    for i in range(1, maze.grid.shape[0] - 1):
+        for j in range(1, maze.grid.shape[1] - 1):
+            if maze.grid[i][j] == SquareType.WALL.value:
+                r = random.randint(1, 7)
+                if r == 7:
+                    if canBreakWall(maze, (i, j)):
+                        maze.grid[i][j] = SquareType.ROOM.value
 
-    @staticmethod
-    def wallBreaker(maze):
-        for i in range(1, maze.grid.shape[0] - 1):
-            for j in range(1, maze.grid.shape[1] - 1):
-                if maze.grid[i][j] == SquareType.WALL.value:
-                    r = random.randint(1, 7)
-                    if r == 7:
-                        if MazeManager.canBreakWall(maze, (i, j)):
-                            maze.grid[i][j] = SquareType.ROOM.value
 
-    @staticmethod
-    def defineStateSpace(maze):
-        # maze.start and maze.end are on the outer wall. therefore, you can get the only adjacent room
-        # simply by calling getAdjacentSquares on it and it returns only one room.
-        state_space = [maze.start, maze.end]
+def defineStateSpace(maze):
+    # maze.start and maze.end are on the outer wall. therefore, you can get the only adjacent room
+    # simply by calling getAdjacentSquares on it and it returns only one room.
+    state_space = [maze.start, maze.end]
 
-        for i in range(1, maze.grid.shape[0] - 1):
-            for j in range(1, maze.grid.shape[1] - 1):
-                if maze.grid[i][j] == SquareType.ROOM.value:
-                    if MazeManager.isState(maze, (i, j)):
-                        state_space.append((i, j))
+    for i in range(1, maze.grid.shape[0] - 1):
+        for j in range(1, maze.grid.shape[1] - 1):
+            if maze.grid[i][j] == SquareType.ROOM.value:
+                if isState(maze, (i, j)):
+                    state_space.append((i, j))
 
-        return state_space
+    return state_space
 
-    @staticmethod
-    def isState(maze, room):
-        return len(MazeManager.getAdjacentSquares(maze, room, SquareType.ROOM)) >= 3 or room == maze.start or room == maze.end
 
-    @staticmethod
-    def getReachablePaths(maze, start):
-        paths = []
-        visited_adjacents = []
-        reachable_states = []
-        current_path = []
+def isState(maze, room):
+    return len(getAdjacentSquares(maze, room, SquareType.ROOM)) >= 3 or \
+           room == maze.start or \
+           room == maze.end
 
-        room = start
 
-        while True:
-            # Find adjacents actual node
-            adjacents = MazeManager.getAdjacentSquares(maze, room, SquareType.ROOM)
+def getReachablePaths(maze, start):
+    paths = []
+    visited_adjacents = []
+    reachable_states = []
+    current_path = []
 
-            # Find an adjacent not yet explored
-            current_adjacent = None
+    room = start
 
-            for adjacent in adjacents:
-                if adjacent not in visited_adjacents:
-                    current_adjacent = adjacent
-                    break
+    while True:
+        # Find adjacents actual node
+        adjacents = getAdjacentSquares(maze, room, SquareType.ROOM)
 
-            if current_adjacent:
-                visited_adjacents.append(room)
-                visited_adjacents.append(current_adjacent)
+        # Find an adjacent not yet explored
+        current_adjacent = None
 
-                current_path.append(current_adjacent)
+        for adjacent in adjacents:
+            if adjacent not in visited_adjacents:
+                current_adjacent = adjacent
+                break
 
-                # If the adjacent is a reachable state of start node
-                if MazeManager.isState(maze, current_adjacent):
-                    reachable_states.append(current_adjacent)
-                    paths.append(current_path)
+        if current_adjacent:
+            visited_adjacents.append(room)
+            visited_adjacents.append(current_adjacent)
 
-                    current_path = []
-                    room = start
+            current_path.append(current_adjacent)
 
-                else:
-                    room = current_adjacent
+            # If the adjacent is a reachable state of start node
+            if isState(maze, current_adjacent):
+                reachable_states.append(current_adjacent)
+                paths.append(current_path)
 
-            else:
-                if room == start:
-                    return reachable_states, paths
                 current_path = []
                 room = start
+
+            else:
+                room = current_adjacent
+
+        else:
+            if room == start:
+                return reachable_states, paths
+            current_path = []
+            room = start
+
+
+if __name__ == '__main__':
+    maze = generateMaze(5, 5)

@@ -3,8 +3,8 @@ from tkinter import font as tkfont
 
 import sys
 
-from maze import MazeManager
-from gui import changeImage, showImage
+from maze import generateMaze
+from gui import changeImage
 from search_algorithms import breadth_first_search, \
     A_star_search, \
     uniform_cost_search, \
@@ -50,7 +50,7 @@ class SampleApp(tk.Tk):
         frame.tkraise()
 
     def initialize_maze(self, width=5, height=5):
-        self.maze = MazeManager.generateMaze(height, width, seed=12345)
+        self.maze = generateMaze(height, width, seed=12345)
 
     def setAlgorithm(self, algorithm):
         if algorithm != breadth_first_search and \

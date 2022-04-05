@@ -1,6 +1,6 @@
 import time
 
-from maze import MazeManager
+from maze import generateMaze
 from search_algorithms import breadth_first_search, \
     A_star_search, \
     uniform_cost_search, \
@@ -32,7 +32,7 @@ def analysis(min_size, max_size, n_mazes):
             }
         }
         for i in range(n_mazes):
-            maze = MazeManager.generateMaze(size, size)
+            maze = generateMaze(size, size)
 
             for algorithm in [breadth_first_search, uniform_cost_search,
                               A_star_search, iterative_deepening_depth_first_search]:
