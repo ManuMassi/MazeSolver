@@ -98,15 +98,11 @@ def tree_search(maze, enqueue, max_depth=None, draw=True, analysis=False):
                 drawTree(expanded, node, str(filename), goal=True)
 
             if analysis:
-                for node in expanded:
-                    for child in node.children:
-                        if child not in expanded:
-                            generated_nodes += 1
-
-                generated_nodes += len(expanded)
+                generated_nodes = len(expanded) + len(fringe)
 
                 return solution, generated_nodes, node.path_cost
-            return solution
+            else:
+                return solution
         else:
             # Expand the node
             successors = expand(maze, node)
@@ -192,26 +188,18 @@ def iterative_deepening_depth_first_search(maze, draw=True, analysis=False):
         for node in nodes:
             fringe.insert(0, node)
 
-    if analysis:
-        tot_expanded = 0
-
     max_depth = 1
+
     solution = False
-
     while not solution:
-        found_solution = tree_search(maze, enqueue, max_depth, draw=draw, analysis=analysis)
-
-        if found_solution:
-            if analysis:
-                solution, generated_nodes, path_cost = found_solution
-                tot_expanded += generated_nodes
-
-        else:
-            solution = found_solution
+        solution = tree_search(maze, enqueue, max_depth, draw=draw, analysis=analysis)
 
         max_depth += 1
 
     if analysis:
-        return solution, tot_expanded, path_cost
+        tot_nodes = solution[1]
+        path_cost = solution[2]
+
+        return solution[0], tot_nodes, path_cost
 
     return solution

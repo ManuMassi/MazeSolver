@@ -36,11 +36,3 @@ class Node:
 
     def __repr__(self):
         return self.__str__()
-
-
-class Tree:
-    def __init__(self, root):
-        if type(root) is not Node:
-            raise TypeError("You must add a node type (Node(data))")
-
-        self.root = root
