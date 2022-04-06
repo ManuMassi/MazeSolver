@@ -11,7 +11,11 @@ from search_algorithms import breadth_first_search, \
     iterative_deepening_depth_first_search
 
 
-class SampleApp(tk.Tk):
+class MazeSolverApp(tk.Tk):
+    """
+    Main class to manage the menu.
+    It manages all the frames relative to each different page of the application.
+    """
 
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
@@ -28,6 +32,7 @@ class SampleApp(tk.Tk):
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
 
+        # Initialize all the frames
         self.frames = {}
         for F in (StartPage, MazeSelectPage, SizeSelectPage, AlgorithmSelectPage, SolverPage):
             page_name = F.__name__
@@ -39,20 +44,33 @@ class SampleApp(tk.Tk):
             # will be the one that is visible.
             frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame("StartPage")
+        self.show_frame("StartPage") # Show the starting page
 
         self.maze = None
         self.algorithm = None
 
     def show_frame(self, page_name):
+        """
+        Method to show a page given its name
+        :param page_name: the name of the page to show
+        """
         # Show a frame for the given page name
         frame = self.frames[page_name]
         frame.tkraise()
 
     def initialize_maze(self, width=5, height=5):
+        """
+        Method that initialize the maze relative to the application
+        :param width of the maze
+        :param height of the maze
+        """
         self.maze = generateMaze(height, width, seed=12345)
 
     def setAlgorithm(self, algorithm):
+        """
+        Method that sets the current algorithm for path finding
+        :param algorithm to use
+        """
         if algorithm != breadth_first_search and \
                 algorithm != A_star_search and \
                 algorithm != uniform_cost_search and \
@@ -61,7 +79,7 @@ class SampleApp(tk.Tk):
 
         self.algorithm = algorithm
 
-        self.algorithm(self.maze)
+        self.algorithm(self.maze)  # Solve the maze right after algorithm selection
 
 
 class StartPage(tk.Frame):
@@ -190,5 +208,5 @@ class SolverPage(tk.Frame):
 
 
 if __name__ == "__main__":
-    app = SampleApp()
+    app = MazeSolverApp()
     app.mainloop()

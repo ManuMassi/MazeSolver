@@ -60,7 +60,7 @@ def analysis(min_size, max_size, n_mazes):
                 analysis_result[algorithm]['avg_nodes'] += generated_nodes
                 analysis_result[algorithm]['avg_path_cost'] += path_cost
 
-        # Prints all the informations
+        # Prints all the information
         print("Size", size)
         for algo in analysis_result.keys():
             print("Algo:", algo.__name__)
@@ -72,4 +72,4 @@ def analysis(min_size, max_size, n_mazes):
 
 
 if __name__ == "__main__":
-    analysis(20, 20, n_mazes=30)
+    analysis(5, 20, n_mazes=1)

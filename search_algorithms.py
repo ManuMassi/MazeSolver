@@ -157,6 +157,15 @@ def _prune(node, expanded, maze, draw=True):
 
 
 def breadth_first_search(maze, draw=True, analysis=False):
+    """
+    Implementation of the breadth first search algorithm for maze pathfinding
+    :param maze: the maze to solve
+    :param draw: boolean parameter that allows to save images of the maze step by step (it increase time complexity)
+    :param analysis: boolean parameter that allows to return more information about the algorithm
+    :return: the solution and, if analysis is true, also the number of generated notes and the path cost
+    """
+
+    # The bfs algorithm add the new nodes to the end of the fringe (fifo)
     def enqueue(nodes, fringe):
         for node in nodes:
             fringe.append(node)
@@ -165,6 +174,16 @@ def breadth_first_search(maze, draw=True, analysis=False):
 
 
 def uniform_cost_search(maze, draw=True, analysis=False):
+    """
+    Implementation of the uniform cost search algorithm for maze pathfinding
+    :param maze: the maze to solve
+    :param draw: boolean parameter that allows to save images of the maze step by step (it increase time complexity)
+    :param analysis: boolean parameter that allows to return more information about the algorithm
+    :return: the solution and, if analysis is true, also the number of generated notes and the path cost
+    """
+
+    # The ucs algorithm choose to expand the node with the minimum path cost.
+    # Since the tree_search takes always the first node from the fringe, it sorts the fringe by path cost
     def enqueue(nodes, fringe):
         fringe.extend(nodes)
         fringe.sort(key=lambda node: node.path_cost)
@@ -173,9 +192,19 @@ def uniform_cost_search(maze, draw=True, analysis=False):
 
 
 def A_star_search(maze, draw=True, analysis=False):
+    """
+    Implementation of the A* search algorithm for maze pathfinding
+    :param maze: the maze to solve
+    :param draw: boolean parameter that allows to save images of the maze step by step (it increase time complexity)
+    :param analysis: boolean parameter that allows to return more information about the algorithm
+    :return: the solution and, if analysis is true, also the number of generated notes and the path cost
+    """
+
+    # Heuristic function defined for each node
     def heuristic(node, goal):
         return abs(node[0] - goal[0]) + abs(node[1] - goal[1])
 
+    # The A* algorithm expands the node with the minimum value of [g(n) + h(n)], so it sorts the fringe by this value
     def enqueue(nodes, fringe):
         fringe.extend(nodes)
         fringe.sort(key=lambda node: node.path_cost + heuristic(node.data, maze.end))
@@ -184,6 +213,15 @@ def A_star_search(maze, draw=True, analysis=False):
 
 
 def iterative_deepening_depth_first_search(maze, draw=True, analysis=False):
+    """
+    Implementation of the iterative deepening depth first search algorithm for maze pathfinding.
+    :param maze: the maze to solve
+    :param draw: boolean parameter that allows to save images of the maze step by step (it increase time complexity)
+    :param analysis: boolean parameter that allows to return more information about the algorithm
+    :return: the solution and, if analysis is true, also the number of generated notes and the path cost
+    """
+
+    # The depth first search expands the last node found, so it adds the new nodes in the head of the fringe
     def enqueue(nodes, fringe):
         for node in nodes:
             fringe.insert(0, node)
@@ -191,15 +229,10 @@ def iterative_deepening_depth_first_search(maze, draw=True, analysis=False):
     max_depth = 1
 
     solution = False
+    # Until it does not find a solution, it increases the max_depth
     while not solution:
         solution = tree_search(maze, enqueue, max_depth, draw=draw, analysis=analysis)
 
         max_depth += 1
-
-    if analysis:
-        tot_nodes = solution[1]
-        path_cost = solution[2]
-
-        return solution[0], tot_nodes, path_cost
 
     return solution
