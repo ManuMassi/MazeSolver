@@ -1,4 +1,4 @@
-**Artificial Intelligence project** made for the AI course.
+**Artificial Intelligence project** made for the AI course of Computer Engineering, Cybersecurity and Artificial Intelligence's master degree.
 
 This project is made by Emmanuele Massidda and Aurora Arrus.
 
