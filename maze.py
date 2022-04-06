@@ -261,7 +261,3 @@ def getReachablePaths(maze, start):
                 return reachable_states, paths
             current_path = []
             room = start
-
-
-if __name__ == '__main__':
-    maze = generateMaze(5, 5)

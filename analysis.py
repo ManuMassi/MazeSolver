@@ -50,12 +50,12 @@ def analysis(min_size, max_size, n_mazes):
             for algorithm in [breadth_first_search, uniform_cost_search,
                               A_star_search, iterative_deepening_depth_first_search]:
 
-                # Saving all the informations about a maze
+                # Saving all the information about a maze
                 start_time = time.time()
                 generated_nodes, path_cost = algorithm(maze, draw=False, analysis=True)[1:]
                 end_time = time.time()
 
-                # Calculating the average datas for each information
+                # Calculating the average data for each information
                 analysis_result[algorithm]['avg_time'] += (end_time - start_time)
                 analysis_result[algorithm]['avg_nodes'] += generated_nodes
                 analysis_result[algorithm]['avg_path_cost'] += path_cost
@@ -72,4 +72,4 @@ def analysis(min_size, max_size, n_mazes):
 
 
 if __name__ == "__main__":
-    analysis(5, 20, n_mazes=1)
+    analysis(5, 15, n_mazes=30)
