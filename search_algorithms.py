@@ -145,11 +145,12 @@ def _prune(node, expanded, maze, draw=True):
     if node in expanded:
         expanded.remove(node)
 
+    # If the node has a father
     if len(node.ancestors) > 0:
-        # Prune the node
+        # Remove the node from the father's children list
         node.ancestors[0].children.remove(node)
 
-        # Prune recursively its parent
+        # Prune recursively its parent if it hasn't any other children
         if len(node.ancestors[0].children) == 0:
             _prune(node.ancestors[0], expanded, maze, draw)
 
